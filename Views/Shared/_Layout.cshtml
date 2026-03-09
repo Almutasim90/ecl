@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ECL</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ECL.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- DataTables Material theme via the official DT bundle CDN -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.13.6/r-2.5.0/datatables.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Syncfusion ASP.NET Core controls styles -->
+    <!-- Syncfusion removed -->
+</head>
+<body>
+    <button id="drawer-toggle" class="btn btn-light position-fixed" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">
+        <i class="bi bi-list fs-4" aria-hidden="true"></i>
+    </button>
+
+    <div class="content-wrapper">
+        <div id="sidebar" class="sidebar" role="navigation" aria-label="Primary">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-soundwave text-primary me-2"></i>ECL
+            </a>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house me-2"></i>Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
+                        <i class="bi bi-shield-check me-2"></i>Privacy
+                    </a>
+                </li>
+                <!-- Syncfusion index removed -->
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="ListeningQuestions" asp-action="Index">
+                        <i class="bi bi-headphones me-2"></i>Manage Listening Questions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="ReadingQuestions" asp-action="Index">
+                        <i class="bi bi-journal-text me-2"></i>Manage Reading Questions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="ReadingQuestions" asp-action="StartQuiz">
+                        <i class="bi bi-book me-2"></i>Start Reading Quiz
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="ListeningQuestions" asp-action="StartQuiz">
+                        <i class="bi bi-ear me-2"></i>Start Listening Quiz
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="main-content" class="main-content">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+
+            <footer class="border-top footer text-muted">
+                <div class="container">
+                    &copy; 2025 - ECL - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- DataTables bundle (core + responsive) via official DT CDN -->
+    <script src="https://cdn.datatables.net/v/dt/dt-1.13.6/r-2.5.0/datatables.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="module" src="~/js/drawer.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <!-- Syncfusion scripts removed -->
+</body>
+</html>

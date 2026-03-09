@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"supabase": {
+			"type": "http",
+			"url": "http://supabasekong-kw00scwwgsgc8gs48kccck04.62.169.27.210.sslip.io/mcp"
+		}
+	},
+	"inputs": []
+}

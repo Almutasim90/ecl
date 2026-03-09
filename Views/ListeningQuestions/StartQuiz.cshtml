@@ -1,0 +1,23 @@
+@model List<int>
+@{
+    ViewData["Title"] = "Start Quiz";
+}
+
+<h1 class="mb-4">Start Quiz</h1>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+
+
+    
+    @foreach (var num in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-lg hover-shadow">
+               
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <h2 class="card-title">Form @num</h2>
+                    <a asp-action="Quiz" asp-route-formNumber="@num" class="btn btn-primary mt-3">Start Form @num</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
