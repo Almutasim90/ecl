@@ -7,13 +7,17 @@ namespace ECL.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-
         }
 
         public DbSet<ListeningQuestion> ListeningQuestions { get; set; }
         public DbSet<ReadingQuestion> ReadingQuestions { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Explicitly set default schema to 'public' for PostgreSQL
+            modelBuilder.HasDefaultSchema("public");
+        }
     }
-
-
 }

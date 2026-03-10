@@ -4,11 +4,9 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Allow Flutter (and any other cross-platform client) to call the API from any origin
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -18,8 +16,18 @@ builder.Services.AddCors(options =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+    ?? builder.Configuration["ConnectionStrings__DefaultConnection"];
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("❌ FATAL: Connection string 'DefaultConnection' was not found.");
+    Console.WriteLine("Available env vars:");
+    foreach (var e in Environment.GetEnvironmentVariables().Keys)
+        Console.WriteLine($"  {e}");
+    throw new InvalidOperationException("Connection string not found - check Coolify environment variables.");
+}
+
+Console.WriteLine($"✅ Connection string found: Host={new NpgsqlConnectionStringBuilder(connectionString).Host}");
 
 try
 {
@@ -27,51 +35,75 @@ try
 }
 catch (Exception ex)
 {
-    throw new InvalidOperationException(
-        "Invalid PostgreSQL connection string in 'ConnectionStrings:DefaultConnection'. " +
-        "Remove SQL Server keys like Trusted_Connection or MultipleActiveResultSets.", ex);
+    throw new InvalidOperationException("Invalid PostgreSQL connection string.", ex);
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, npgsqlOptions =>
         npgsqlOptions.EnableRetryOnFailure()));
 
-
-
 var app = builder.Build();
 
-// Auto-apply EF Core migrations on startup (runs inside the Coolify container
-// which shares the Docker network with supabase-db-*)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+    
+    Console.WriteLine("🔍 DATABASE DIAGNOSTICS:");
+    Console.WriteLine($"   Connection: {connectionString.Replace(new NpgsqlConnectionStringBuilder(connectionString).Password ?? "", "***")}");
+    
+    try
+    {
+        Console.WriteLine("   Testing connection...");
+        await db.Database.CanConnectAsync();
+        Console.WriteLine("   ✅ Connection successful!");
+        
+        Console.WriteLine("   Running migrations...");
+        await db.Database.MigrateAsync();
+        Console.WriteLine("   ✅ Migrations applied successfully.");
+        
+        // Verify tables exist
+        var listeningCount = await db.ListeningQuestions.CountAsync();
+        var readingCount = await db.ReadingQuestions.CountAsync();
+        Console.WriteLine($"   📊 Data: {listeningCount} Listening, {readingCount} Reading questions");
+        Console.WriteLine("   ✅ Database fully operational.");
+    }
+    catch (Npgsql.NpgsqlException npgEx)
+    {
+        Console.WriteLine($"   ❌ PostgreSQL Error: {npgEx.Message}");
+        Console.WriteLine($"   Error Code: {npgEx.SqlState}");
+        Console.WriteLine($"   Severity: {npgEx.Severity}");
+        if (npgEx.InnerException != null)
+            Console.WriteLine($"   Inner: {npgEx.InnerException.Message}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"   ❌ General Error: {ex.GetType().Name}");
+        Console.WriteLine($"   Message: {ex.Message}");
+        if (ex.InnerException != null)
+            Console.WriteLine($"   Inner: {ex.InnerException.Message}");
+        Console.WriteLine($"   Stack: {ex.StackTrace?.Split('\n').FirstOrDefault()}");
+    }
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-// Enable HTTPS redirection only when not in Development so local LAN devices can use HTTP
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
 app.UseRouting();
-
 app.UseCors("AllowAll");
-
 app.UseAuthorization();
-
 app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

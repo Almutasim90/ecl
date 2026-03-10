@@ -1,0 +1,17 @@
+services:
+  app:
+    image: "${SERVICE_IMAGE}"
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8081
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+    networks:
+      - coolify
+      - supabase_network
+
+networks:
+  coolify:
+    external: true
+  supabase_network:
+    external: true
+    name: kw00scwwgsgc8gs48kccck04
