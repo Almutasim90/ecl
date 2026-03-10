@@ -44,8 +44,16 @@ var app = builder.Build();
 // which shares the Docker network with supabase-db-*)
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await db.Database.MigrateAsync();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await db.Database.MigrateAsync();
+        Console.WriteLine("✅ Migration successful");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Migration failed: {ex.Message}");
+    }
 }
 
 // Configure the HTTP request pipeline.
