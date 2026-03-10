@@ -1,6 +1,7 @@
 using ECL.Data;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using ECL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,46 +45,50 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+// Run diagnostics and migrations before middleware
+var runDiagnostics = async () =>
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    
-    Console.WriteLine("🔍 DATABASE DIAGNOSTICS:");
-    Console.WriteLine($"   Connection: {connectionString.Replace(new NpgsqlConnectionStringBuilder(connectionString).Password ?? "", "***")}");
-    
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        Console.WriteLine("   Testing connection...");
-        await db.Database.CanConnectAsync();
-        Console.WriteLine("   ✅ Connection successful!");
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
-        Console.WriteLine("   Running migrations...");
-        await db.Database.MigrateAsync();
-        Console.WriteLine("   ✅ Migrations applied successfully.");
+        Console.WriteLine("🔍 DATABASE DIAGNOSTICS:");
+        Console.WriteLine($"   Connection: {connectionString.Replace(new NpgsqlConnectionStringBuilder(connectionString).Password ?? "", "***")}");
         
-        // Verify tables exist
-        var listeningCount = await db.ListeningQuestions.CountAsync();
-        var readingCount = await db.ReadingQuestions.CountAsync();
-        Console.WriteLine($"   📊 Data: {listeningCount} Listening, {readingCount} Reading questions");
-        Console.WriteLine("   ✅ Database fully operational.");
+        try
+        {
+            Console.WriteLine("   Testing connection...");
+            await db.Database.CanConnectAsync();
+            Console.WriteLine("   ✅ Connection successful!");
+            
+            Console.WriteLine("   Running migrations...");
+            await db.Database.MigrateAsync();
+            Console.WriteLine("   ✅ Migrations applied successfully.");
+            
+          
+         
+        }
+        catch (Npgsql.NpgsqlException npgEx)
+        {
+            Console.WriteLine($"   ❌ PostgreSQL Error: {npgEx.Message}");
+            Console.WriteLine($"   Error Code: {npgEx.SqlState}");
+            Console.WriteLine($"   Severity: {npgEx.Severity}");
+            if (npgEx.InnerException != null)
+                Console.WriteLine($"   Inner: {npgEx.InnerException.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"   ❌ General Error: {ex.GetType().Name}");
+            Console.WriteLine($"   Message: {ex.Message}");
+            if (ex.InnerException != null)
+                Console.WriteLine($"   Inner: {ex.InnerException.Message}");
+            Console.WriteLine($"   Stack: {ex.StackTrace?.Split('\n').FirstOrDefault()}");
+        }
     }
-    catch (Npgsql.NpgsqlException npgEx)
-    {
-        Console.WriteLine($"   ❌ PostgreSQL Error: {npgEx.Message}");
-        Console.WriteLine($"   Error Code: {npgEx.SqlState}");
-        Console.WriteLine($"   Severity: {npgEx.Severity}");
-        if (npgEx.InnerException != null)
-            Console.WriteLine($"   Inner: {npgEx.InnerException.Message}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"   ❌ General Error: {ex.GetType().Name}");
-        Console.WriteLine($"   Message: {ex.Message}");
-        if (ex.InnerException != null)
-            Console.WriteLine($"   Inner: {ex.InnerException.Message}");
-        Console.WriteLine($"   Stack: {ex.StackTrace?.Split('\n').FirstOrDefault()}");
-    }
-}
+};
+
+// Execute diagnostics
+await runDiagnostics();
 
 if (!app.Environment.IsDevelopment())
 {
