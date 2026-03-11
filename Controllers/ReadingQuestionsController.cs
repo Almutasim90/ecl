@@ -208,23 +208,46 @@ namespace ECL.Controllers
         // GET: ReadingQuestions/StartQuiz
         public async Task<IActionResult> StartQuiz()
         {
-            var forms = await _context.ReadingQuestions
-                .Select(q => q.FormNumber)
-                .Distinct()
-                .OrderBy(n => n)
-                .ToListAsync();
-            return View(forms);
+            try
+            {
+                var forms = await _context.ReadingQuestions
+                    .Select(q => q.FormNumber)
+                    .Distinct()
+                    .OrderBy(n => n)
+                    .ToListAsync();
+                return View(forms);
+            }
+            catch (Exception ex)
+            {
+                TempData["DbError"] = $"Could not load quiz forms: {ex.Message}";
+                return View(new List<int>());
+            }
         }
 
         // GET: ReadingQuestions/Quiz/5
         public async Task<IActionResult> Quiz(int formNumber)
         {
-            var questions = await _context.ReadingQuestions
-                .Where(q => q.FormNumber == formNumber)
-                .OrderBy(q => q.Qno)
-                .ToListAsync();
-            ViewBag.FormNumber = formNumber;
-            return View(questions);
+            try
+            {
+                var questions = await _context.ReadingQuestions
+                    .Where(q => q.FormNumber == formNumber)
+                    .OrderBy(q => q.Qno)
+                    .ToListAsync();
+
+                if (!questions.Any())
+                {
+                    TempData["DbError"] = $"No questions found for Form {formNumber}. The database may be empty or unreachable.";
+                    return RedirectToAction(nameof(StartQuiz));
+                }
+
+                ViewBag.FormNumber = formNumber;
+                return View(questions);
+            }
+            catch (Exception ex)
+            {
+                TempData["DbError"] = $"Could not load quiz for Form {formNumber}: {ex.Message}";
+                return RedirectToAction(nameof(StartQuiz));
+            }
         }
 
         private bool ReadingQuestionExists(int id)

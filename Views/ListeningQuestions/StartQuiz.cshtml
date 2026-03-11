@@ -4,6 +4,23 @@
 }
 
 <h1 class="mb-4">Start Quiz</h1>
+
+@if (TempData["DbError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>⚠️ Database Error:</strong> @TempData["DbError"]
+        <br/><small>Check that the database is connected and contains data. Contact your administrator if this persists.</small>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning text-center">
+        No quiz forms available. The database may be empty or unreachable.
+    </div>
+}
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
 
 
