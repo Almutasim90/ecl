@@ -2,15 +2,16 @@
     ViewData["Title"] = "Reading Questions";
 }
 
-<h1>Reading Questions</h1>
-<p>
-    <a asp-action="Create" class="btn btn-primary">
-        <span class="material-icons align-middle" style="font-size:18px">add</span> Create New
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Reading Questions</h1>
+    <a asp-action="Create"
+       class="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition text-sm">
+        <span class="material-icons text-sm">add</span> Create New
     </a>
-</p>
+</div>
 
-<div class="table-responsive">
-    <table id="ReadingTable" class="display material hover stripe" style="width:100%">
+<div class="overflow-x-auto rounded-lg shadow">
+    <table id="ReadingTable" class="display material hover stripe w-full">
         <thead>
             <tr>
                 <th>Q#</th>
@@ -35,12 +36,10 @@
             processing:  true,
             responsive:  true,
             pageLength:  10,
-            // GET request — no CSRF token needed, responses are cache-friendly
             ajax: {
                 url:  '@Url.Action("LoadData", "ReadingQuestions")',
                 type: 'GET',
                 data: function (d) {
-                    // Map DataTables internal params to our clean action parameters
                     return {
                         draw:        d.draw,
                         start:       d.start,

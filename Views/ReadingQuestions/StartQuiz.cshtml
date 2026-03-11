@@ -2,34 +2,33 @@
 @{
     ViewData["Title"] = "Start Reading Quiz";
 }
-<h1 class="mb-4 text-center">Start Reading Quiz</h1>
+
+<h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Start Reading Quiz</h1>
 
 @if (TempData["DbError"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded mb-4">
         <strong>⚠️ Database Error:</strong> @TempData["DbError"]
-        <br/><small>Check that the database is connected and contains data. Contact your administrator if this persists.</small>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <br/><small>Check that the database is connected and contains data.</small>
     </div>
 }
 
 @if (!Model.Any())
 {
-    <div class="alert alert-warning text-center">
+    <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4 text-center">
         No quiz forms available. The database may be empty or unreachable.
     </div>
 }
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
     @foreach (var num in Model)
     {
-        <div class="col">
-            <div class="card h-100 shadow-sm hover-shadow">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h2 class="card-title">Form @num</h2>
-                    <a asp-action="Quiz" asp-route-formNumber="@num" class="btn btn-success mt-3">Start Form @num</a>
-                </div>
-            </div>
+        <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center hover:shadow-lg transition">
+            <h2 class="text-xl font-bold text-gray-700 mb-3">Form @num</h2>
+            <a asp-action="Quiz" asp-route-formNumber="@num"
+               class="px-5 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition">
+                Start Form @num
+            </a>
         </div>
     }
 </div>

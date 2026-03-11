@@ -1,13 +1,68 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center mt-5">
-    <h1 class="display-4">Welcome to ECL</h1>
-    <p class="lead">Your English Comprehension Learning platform.</p>
-    <p>Use the navigation menu to manage questions and start quizzes.</p>
-    <a class="btn btn-primary btn-lg mt-3" asp-area="" asp-controller="ListeningQuestions" asp-action="StartQuiz">Start Listening Quiz</a>      
-    <a class="btn btn-secondary btn-lg mt-3 ms-2" asp-area="" asp-controller="ReadingQuestions" asp-action="StartQuiz">Start Reading Quiz</a>   
+<div class="mb-8 p-6 rounded-2xl text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);">
+    <h1 class="text-3xl font-bold mb-1">Welcome to ECL</h1>
+    <p class="text-blue-200 text-sm">English Comprehension Learning &mdash; manage questions and practice quizzes.</p>
+</div>
 
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <a asp-controller="ListeningQuestions" asp-action="Index" class="dash-card flex items-center gap-4 no-underline">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#eff6ff;color:#2563eb">
+            <i class="bi bi-headphones"></i>
+        </div>
+        <div>
+            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Manage</div>
+            <div class="font-700 text-gray-800 font-semibold">Listening Questions</div>
+        </div>
+    </a>
+    <a asp-controller="ReadingQuestions" asp-action="Index" class="dash-card flex items-center gap-4 no-underline">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#f0fdf4;color:#16a34a">
+            <i class="bi bi-journal-text"></i>
+        </div>
+        <div>
+            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Manage</div>
+            <div class="font-700 text-gray-800 font-semibold">Reading Questions</div>
+        </div>
+    </a>
+    <a asp-controller="ListeningQuestions" asp-action="StartQuiz" class="dash-card flex items-center gap-4 no-underline">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#f5f3ff;color:#7c3aed">
+            <i class="bi bi-ear"></i>
+        </div>
+        <div>
+            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Practice</div>
+            <div class="font-700 text-gray-800 font-semibold">Listening Quiz</div>
+        </div>
+    </a>
+    <a asp-controller="ReadingQuestions" asp-action="StartQuiz" class="dash-card flex items-center gap-4 no-underline">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style="background:#fff7ed;color:#ea580c">
+            <i class="bi bi-book-open"></i>
+        </div>
+        <div>
+            <div class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Practice</div>
+            <div class="font-700 text-gray-800 font-semibold">Reading Quiz</div>
+        </div>
+    </a>
+</div>
 
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="dash-card">
+        <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <i class="bi bi-ear text-blue-500"></i> Listening Quiz
+        </h2>
+        <p class="text-sm text-gray-500 mb-4">Test your listening comprehension with audio-based multiple-choice questions.</p>
+        <a asp-controller="ListeningQuestions" asp-action="StartQuiz" class="btn-primary">
+            <i class="bi bi-play-fill"></i> Start Now
+        </a>
+    </div>
+    <div class="dash-card">
+        <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
+            <i class="bi bi-book-open text-green-600"></i> Reading Quiz
+        </h2>
+        <p class="text-sm text-gray-500 mb-4">Strengthen your reading skills with text-based comprehension questions.</p>
+        <a asp-controller="ReadingQuestions" asp-action="StartQuiz" class="btn-success">
+            <i class="bi bi-play-fill"></i> Start Now
+        </a>
+    </div>
 </div>

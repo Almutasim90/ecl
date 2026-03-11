@@ -6,23 +6,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Exclude nested git repo that was accidentally checked out inside the project -->
   <ItemGroup>
-    <None Include="Controllers\ReadingQuestionsController.cs" />
+    <Compile Remove="ecl/**" />
+    <Content Remove="ecl/**" />
+    <EmbeddedResource Remove="ecl/**" />
+    <None Remove="ecl/**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="ecl\**\*.cs" />
-    <Content Remove="ecl\**\*" />
-    <EmbeddedResource Remove="ecl\**\*" />
-    <None Remove="ecl\**\*" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
       <PrivateAssets>all</PrivateAssets>
@@ -31,5 +30,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
    
   </ItemGroup>
+
+  <!-- Build Tailwind CSS before dotnet publish (CI/Docker) -->
+  <Target Name="BuildTailwind" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Exec Command="npm run css:build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
 
 </Project>

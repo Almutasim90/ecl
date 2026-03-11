@@ -1,5 +1,6 @@
 using ECL.Data;
 using ECL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace ECL.Controllers
 {
     [ApiController]
     [Route("api/reading")]
+    [Authorize]
     public class ReadingQuestionsApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -136,6 +138,7 @@ namespace ECL.Controllers
         // POST api/reading
         // ---------------------------------------------------------------
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create([FromBody] ReadingQuestion question)
         {
             if (!ModelState.IsValid)
@@ -151,6 +154,7 @@ namespace ECL.Controllers
         // PUT api/reading/{id}
         // ---------------------------------------------------------------
         [HttpPut("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Update(int id, [FromBody] ReadingQuestion question)
         {
             if (id != question.Qno)
@@ -179,6 +183,7 @@ namespace ECL.Controllers
         // DELETE api/reading/{id}
         // ---------------------------------------------------------------
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Delete(int id)
         {
             var question = await _context.ReadingQuestions.FindAsync(id);

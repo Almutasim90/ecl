@@ -2,15 +2,18 @@
     ViewData["Title"] = "Listening Questions";
 }
 
-<h1>Listening Questions</h1>
-<p>
-    <a asp-action="Create" class="btn btn-primary">
-        <span class="material-icons align-middle" style="font-size:18px">add</span> Create New
+<div class="flex items-center justify-between mb-5">
+    <div>
+        <h1 class="text-xl font-bold text-gray-800">Listening Questions</h1>
+        <p class="text-sm text-gray-400 mt-0.5">Browse and manage all audio-based questions.</p>
+    </div>
+    <a asp-action="Create" class="btn-primary">
+        <span class="material-icons" style="font-size:16px">add</span> Create New
     </a>
-</p>
+</div>
 
-<div class="table-responsive">
-    <table id="ListeningTable" class="display material hover stripe" style="width:100%">
+<div class="table-card">
+    <table id="ListeningTable" class="display hover stripe w-full">
         <thead>
             <tr>
                 <th>Q#</th>
@@ -62,7 +65,7 @@
                     orderable:  false,
                     searchable: false,
                     render: function (file) {
-                        if (!file) return '—';
+                        if (!file) return '<span class="text-gray-300">—</span>';
                         return '<audio controls style="width:160px">' +
                                '<source src="/AUDIO/' + file + '" type="audio/wav">' +
                                'Not supported</audio>';
@@ -72,17 +75,26 @@
                 { data: 'optionB',       title: 'Option B' },
                 { data: 'optionC',       title: 'Option C' },
                 { data: 'optionD',       title: 'Option D' },
-                { data: 'correctOption', title: 'Correct',  width: '75px'  },
+                {
+                    data: 'correctOption', title: 'Correct', width: '75px',
+                    render: function (v) {
+                        var labels = ['A','B','C','D'];
+                        var l = labels[v-1] || v;
+                        return '<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#eff6ff;color:#2563eb;font-size:0.75rem;font-weight:700">' + l + '</span>';
+                    }
+                },
                 {
                     data:       'qno',
                     title:      'Actions',
                     orderable:  false,
                     searchable: false,
-                    width:      '160px',
+                    width:      '100px',
                     render: function (id) {
-                        return '<a class="btn btn-sm btn-outline-primary me-1"   href="/ListeningQuestions/Details/' + id + '" title="View"><span class="material-icons" style="font-size:16px">visibility</span></a>' +
-                               '<a class="btn btn-sm btn-outline-secondary me-1" href="/ListeningQuestions/Edit/'    + id + '" title="Edit"><span class="material-icons" style="font-size:16px">edit</span></a>' +
-                               '<a class="btn btn-sm btn-outline-danger"          href="/ListeningQuestions/Delete/'  + id + '" title="Delete"><span class="material-icons" style="font-size:16px">delete</span></a>';
+                        return '<div style="display:flex;gap:5px">' +
+                               '<a class="dt-btn dt-btn-view" href="/ListeningQuestions/Details/' + id + '" title="View"><span class="material-icons" style="font-size:15px">visibility</span></a>' +
+                               '<a class="dt-btn dt-btn-edit"  href="/ListeningQuestions/Edit/'    + id + '" title="Edit"><span class="material-icons" style="font-size:15px">edit</span></a>' +
+                               '<a class="dt-btn dt-btn-delete" href="/ListeningQuestions/Delete/' + id + '" title="Delete"><span class="material-icons" style="font-size:15px">delete</span></a>' +
+                               '</div>';
                     }
                 }
             ],

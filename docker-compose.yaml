@@ -1,10 +1,19 @@
 services:
   app:
     image: "${SERVICE_IMAGE}"
+    restart: unless-stopped
+    volumes:
+      # Mount 600+ WAV files from host — excluded from Docker image
+      - /opt/ecl/audio_files:/app/wwwroot/AUDIO:ro
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8081
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection}
+      # PostgreSQL connection string — set this in Coolify environment variables
+      - DATABASE_URL=${DATABASE_URL}
+      # JWT secret from Supabase GoTrue dashboard
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      # Public URL of the web app for CORS
+      - WEB_ORIGIN=${WEB_ORIGIN:-https://ecl.yourdomain.com}
     networks:
       - coolify
       - supabase_network

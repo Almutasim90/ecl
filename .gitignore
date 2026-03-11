@@ -1,15 +1,3 @@
-## .NET / ASP.NET Core
-bin/
-obj/
-*.user
-*.suo
-.vs/
-.vscode/settings.json
-
-## Publish output
-publish/
-out/
-
-## Secrets (never commit real credentials)
-appsettings.Production.json
-secrets.json
+App_Data/*.db
+App_Data/*.db-shm
+App_Data/*.db-wal

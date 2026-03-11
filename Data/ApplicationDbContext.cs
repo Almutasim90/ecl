@@ -1,4 +1,4 @@
-﻿using ECL.Models;
+using ECL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECL.Data
@@ -16,8 +16,35 @@ namespace ECL.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Explicitly set default schema to 'public' for PostgreSQL
             modelBuilder.HasDefaultSchema("public");
+
+            modelBuilder.Entity<ListeningQuestion>(e =>
+            {
+                e.ToTable("listeningquestions");
+                e.HasKey(x => x.Qno);
+                e.Property(x => x.Qno).HasColumnName("qno");
+                e.Property(x => x.FormNumber).HasColumnName("formnumber");
+                e.Property(x => x.AudioFile).HasColumnName("audiofile");
+                e.Property(x => x.OptionA).HasColumnName("optiona");
+                e.Property(x => x.OptionB).HasColumnName("optionb");
+                e.Property(x => x.OptionC).HasColumnName("optionc");
+                e.Property(x => x.OptionD).HasColumnName("optiond");
+                e.Property(x => x.CorrectOption).HasColumnName("correctoption");
+            });
+
+            modelBuilder.Entity<ReadingQuestion>(e =>
+            {
+                e.ToTable("readingquestions");
+                e.HasKey(x => x.Qno);
+                e.Property(x => x.Qno).HasColumnName("qno");
+                e.Property(x => x.FormNumber).HasColumnName("formnumber");
+                e.Property(x => x.QuestionText).HasColumnName("questiontext");
+                e.Property(x => x.OptionA).HasColumnName("optiona");
+                e.Property(x => x.OptionB).HasColumnName("optionb");
+                e.Property(x => x.OptionC).HasColumnName("optionc");
+                e.Property(x => x.OptionD).HasColumnName("optiond");
+                e.Property(x => x.CorrectOption).HasColumnName("correctoption");
+            });
         }
     }
 }

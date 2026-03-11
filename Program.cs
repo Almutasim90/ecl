@@ -1,173 +1,123 @@
+using System.Text;
+using System.Threading.RateLimiting;
 using ECL.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+// ── CORS ──────────────────────────────────────────────────────────────────
+// Web origin comes from env (production) or falls back to localhost for dev.
+var webOrigin = Environment.GetEnvironmentVariable("WEB_ORIGIN") ?? "http://localhost:5000";
 builder.Services.AddCors(options =>
+    options.AddPolicy("AppPolicy", p => p
+        .WithOrigins(webOrigin, "http://localhost:5000", "http://localhost:5173")
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()));
+
+// ── Database ──────────────────────────────────────────────────────────────
+// In production: DATABASE_URL env var (PostgreSQL Npgsql connection string).
+// In development: fall back to SQLite for local work.
+var connectionString =
+    Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Data Source=App_Data/ecl.db";
+
+var appDataDirectory = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
+Directory.CreateDirectory(appDataDirectory);
+
+if (connectionString.StartsWith("Host=", StringComparison.OrdinalIgnoreCase)
+    || connectionString.StartsWith("Server=", StringComparison.OrdinalIgnoreCase)
+    || connectionString.Contains("postgresql", StringComparison.OrdinalIgnoreCase))
 {
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader());
+    builder.Services.AddDbContext<ApplicationDbContext>(o => o
+        .UseNpgsql(connectionString)
+        .ConfigureWarnings(w => w.Ignore(
+            Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(o => o
+        .UseSqlite(connectionString)
+        .ConfigureWarnings(w => w.Ignore(
+            Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
+}
+
+// ── JWT Auth (Supabase GoTrue) ────────────────────────────────────────────
+var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
+if (!string.IsNullOrWhiteSpace(jwtSecret))
+{
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(30)
+            };
+        });
+
+    builder.Services.AddAuthorization(options =>
+        options.AddPolicy("AdminOnly", p => p.RequireClaim("role", "admin")));
+}
+else
+{
+    // Dev mode: no JWT required — allow everything through
+    builder.Services.AddAuthentication();
+    builder.Services.AddAuthorization(options =>
+        options.AddPolicy("AdminOnly", p => p.RequireAssertion(_ => true)));
+}
+
+// ── Rate Limiting ─────────────────────────────────────────────────────────
+builder.Services.AddRateLimiter(o =>
+{
+    o.AddSlidingWindowLimiter("api", opts =>
+    {
+        opts.PermitLimit = 60;
+        opts.Window = TimeSpan.FromMinutes(1);
+        opts.SegmentsPerWindow = 6;
+        opts.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opts.QueueLimit = 5;
+    });
+    o.RejectionStatusCode = 429;
 });
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? builder.Configuration["ConnectionStrings__DefaultConnection"];
-
-if (string.IsNullOrEmpty(connectionString))
-{
-    Console.WriteLine("❌ FATAL: Connection string 'DefaultConnection' was not found.");
-    Console.WriteLine("Available env vars:");
-    foreach (var e in Environment.GetEnvironmentVariables().Keys)
-        Console.WriteLine($"  {e}");
-    throw new InvalidOperationException("Connection string not found - check Coolify environment variables.");
-}
-
-Console.WriteLine($"✅ Connection string found: Host={new NpgsqlConnectionStringBuilder(connectionString).Host}");
-
-try
-{
-    connectionString = new NpgsqlConnectionStringBuilder(connectionString).ConnectionString;
-}
-catch (Exception ex)
-{
-    throw new InvalidOperationException("Invalid PostgreSQL connection string.", ex);
-}
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString, npgsqlOptions =>
-        npgsqlOptions.EnableRetryOnFailure()));
 
 var app = builder.Build();
 
-// Run diagnostics and migrations before middleware
-var runDiagnostics = async () =>
+using (var scope = app.Services.CreateScope())
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        
-        Console.WriteLine("🔍 DATABASE DIAGNOSTICS:");
-        Console.WriteLine($"   Connection: {connectionString.Replace(new NpgsqlConnectionStringBuilder(connectionString).Password ?? "", "***")}");
-        
-        try
-        {
-            Console.WriteLine("   Testing connection (direct Npgsql)...");
-            const int maxAttempts = 3;
-            var connected = false;
-            Exception? lastError = null;
-            for (int attempt = 1; attempt <= maxAttempts && !connected; attempt++)
-            {
-                try
-                {
-                    await using (var testConn = new NpgsqlConnection(connectionString))
-                    {
-                        await testConn.OpenAsync();
-                    }
-                    connected = true;
-                }
-                catch (Exception ex) when (attempt < maxAttempts)
-                {
-                    lastError = ex;
-                    Console.WriteLine($"   Attempt {attempt}/{maxAttempts} failed, retrying in 2s...");
-                    await Task.Delay(2000);
-                }
-                catch (Exception ex)
-                {
-                    lastError = ex;
-                }
-            }
-            if (!connected)
-            {
-                if (lastError != null)
-                {
-                    Console.WriteLine($"   ❌ Last error: {lastError.Message}");
-                    if (lastError.InnerException != null)
-                        Console.WriteLine($"   Inner: {lastError.InnerException.Message}");
-                }
-                throw new InvalidOperationException("Database connection failed after " + maxAttempts + " attempts. Fix server pg_hba.conf and listen_addresses. See CONNECTION_TROUBLESHOOTING.md.");
-            }
-            Console.WriteLine("   ✅ Connection successful!");
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // SQLite (local dev): run migrations to create tables automatically.
+    // PostgreSQL (Supabase): tables already exist — skip migrations.
+    if (db.Database.IsSqlite())
+        db.Database.Migrate();
+}
 
-            Console.WriteLine("   Testing EF Core CanConnectAsync...");
-            var canConnect = await db.Database.CanConnectAsync();
-            if (!canConnect)
-            {
-                Console.WriteLine("   ❌ EF Core connection test returned FALSE.");
-                throw new InvalidOperationException("Database is not reachable with current connection string.");
-            }
-            
-            Console.WriteLine("   Running migrations...");
-            await db.Database.MigrateAsync();
-            Console.WriteLine("   ✅ Migrations applied successfully.");
-
-            await using var conn = new NpgsqlConnection(connectionString);
-            await conn.OpenAsync();
-
-            await using var cmd = conn.CreateCommand();
-            cmd.CommandText = @"
-                SELECT
-                    current_database()::text,
-                    current_schema()::text,
-                    (SELECT COUNT(*)::int FROM public.""ListeningQuestions""),
-                    (SELECT COUNT(*)::int FROM public.""ReadingQuestions"")";
-
-            await using var reader = await cmd.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                var dbName = reader.GetString(0);
-                var schema = reader.GetString(1);
-                var listeningCount = reader.GetInt32(2);
-                var readingCount = reader.GetInt32(3);
-
-                Console.WriteLine($"   📌 Database: {dbName}");
-                Console.WriteLine($"   📌 Schema: {schema}");
-                Console.WriteLine($"   📊 Rows: Listening={listeningCount}, Reading={readingCount}");
-            }
-            
-          
-         
-        }
-        catch (Npgsql.NpgsqlException npgEx)
-        {
-            Console.WriteLine($"   ❌ PostgreSQL Error: {npgEx.Message}");
-            Console.WriteLine($"   Error Code: {npgEx.SqlState}");
-            if (npgEx.InnerException != null)
-                Console.WriteLine($"   Inner: {npgEx.InnerException.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"   ❌ General Error: {ex.GetType().Name}");
-            Console.WriteLine($"   Message: {ex.Message}");
-            if (ex.InnerException != null)
-                Console.WriteLine($"   Inner: {ex.InnerException.Message}");
-            Console.WriteLine($"   Stack: {ex.StackTrace?.Split('\n').FirstOrDefault()}");
-        }
-    }
-};
-
-// Execute diagnostics
-await runDiagnostics();
-
+// ── HTTP pipeline ─────────────────────────────────────────────────────────
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
-}
-
-if (!app.Environment.IsDevelopment())
-{
     app.UseHttpsRedirection();
 }
 
 app.UseRouting();
-app.UseCors("AllowAll");
+app.UseCors("AppPolicy");
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
+
 app.MapStaticAssets();
 
 app.MapControllerRoute(

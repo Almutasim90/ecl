@@ -1,40 +1,35 @@
 @model List<int>
 @{
-    ViewData["Title"] = "Start Quiz";
+    ViewData["Title"] = "Start Listening Quiz";
 }
-
-<h1 class="mb-4">Start Quiz</h1>
 
 @if (TempData["DbError"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>⚠️ Database Error:</strong> @TempData["DbError"]
-        <br/><small>Check that the database is connected and contains data. Contact your administrator if this persists.</small>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert-error mb-5">
+        <strong>Database Error:</strong> @TempData["DbError"]
+        <br/><small>Check that the database is connected and contains data.</small>
     </div>
 }
 
 @if (!Model.Any())
 {
-    <div class="alert alert-warning text-center">
+    <div class="alert-warning">
         No quiz forms available. The database may be empty or unreachable.
     </div>
 }
-
-<div class="row row-cols-1 row-cols-md-3 g-4">
-
-
-    
-    @foreach (var num in Model)
-    {
-        <div class="col">
-            <div class="card h-100 shadow-lg hover-shadow">
-               
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h2 class="card-title">Form @num</h2>
-                    <a asp-action="Quiz" asp-route-formNumber="@num" class="btn btn-primary mt-3">Start Form @num</a>
+else
+{
+    <p class="text-sm text-gray-400 mb-5">Choose a form to begin your listening practice session.</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @foreach (var num in Model)
+        {
+            <a asp-action="Quiz" asp-route-formNumber="@num" class="quiz-form-card no-underline">
+                <div class="form-number" style="background:#eff6ff;color:#2563eb">@num</div>
+                <div class="text-sm font-semibold text-gray-700">Form @num</div>
+                <div class="text-xs text-blue-500 font-medium mt-1">
+                    <i class="bi bi-play-fill"></i> Start
                 </div>
-            </div>
-        </div>
-    }
-</div>
+            </a>
+        }
+    </div>
+}
