@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Controllers\ReadingQuestionsController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ecl\**\*.cs" />
+    <Content Remove="ecl\**\*" />
+    <EmbeddedResource Remove="ecl\**\*" />
+    <None Remove="ecl\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
