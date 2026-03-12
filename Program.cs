@@ -105,11 +105,13 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ── HTTP pipeline ─────────────────────────────────────────────────────────
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    // Dev only — HTTPS handled by reverse proxy (Coolify/Caddy) in production
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-    app.UseHttpsRedirection();
 }
 
 app.UseRouting();
