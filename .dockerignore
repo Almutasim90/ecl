@@ -7,4 +7,3 @@ node_modules/
 *.md
 .env
 .env.*
-appsettings.Development.json
