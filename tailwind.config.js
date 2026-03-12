@@ -4,6 +4,8 @@ module.exports = {
     "./Views/**/*.cshtml",
     "./Pages/**/*.cshtml"
   ],
+  // Tie Tailwind dark mode to the same attribute the app already uses.
+  darkMode: ['attribute', 'data-theme'],
   theme: {
     extend: {
       colors: {
