@@ -1,218 +1,217 @@
 @model List<ECL.Models.ReadingQuestion>
-@using System.Text.Json;
+@using System.Text.Json
 @{
-    ViewData["Title"] = "Reading Quiz Form " + ViewBag.FormNumber;
+    ViewData["Title"] = "Reading Quiz · Form " + ViewBag.FormNumber;
 }
 
-<div class="my-4 sm:my-8">
-    <div class="quiz-card bg-white">
+<div class="quiz-page-wrap">
+    <div class="quiz-card">
+
         <div class="quiz-card-header-success">
-            <h4 class="text-xl font-bold mb-1">Reading Quiz: Form @ViewBag.FormNumber</h4>
-            <small id="progress" class="text-green-100 italic">Question 1 of @Model.Count</small>
+            <h4><i class="bi bi-book-open"></i> Reading Quiz — Form @ViewBag.FormNumber</h4>
+            <div class="quiz-progress-pill">
+                <i class="bi bi-list-ol"></i>
+                <span id="progress-text">Question 1 of @Model.Count</span>
+            </div>
         </div>
 
-        <div class="p-6 bg-gray-50">
-            <div class="quiz-stats-row flex justify-between items-center mb-4">
-                <div id="stats-summary" class="text-left font-semibold text-sm text-gray-700"></div>
-                <div class="gauge-container w-20 h-20">
-                    <svg viewBox="0 0 100 100">
+        <div class="quiz-body">
+
+            <!-- Stats row -->
+            <div class="quiz-stats-row">
+                <div class="quiz-stats-text" id="stats-summary"></div>
+                <div class="gauge-wrap">
+                    <svg viewBox="0 0 100 100" width="100%" height="100%">
                         <circle class="gauge-bg" cx="50" cy="50" r="45" />
                         <circle class="gauge-fg" cx="50" cy="50" r="45" />
-                        <text id="gauge-text" x="50" y="55" text-anchor="middle" font-size="18" fill="#333"></text>
+                        <text id="gauge-text" x="50" y="57" text-anchor="middle"
+                              font-size="18" font-weight="700" fill="#64748b"></text>
                     </svg>
                 </div>
             </div>
 
-            <div id="question-text" class="mb-5 text-lg font-medium text-gray-800"></div>
+            <!-- Question text -->
+            <div id="question-text" class="quiz-q-text"></div>
 
-            <form id="quizForm">
-                <div id="optionsContainer" class="space-y-2 mb-4"></div>
+            <!-- Options (injected by JS) -->
+            <div id="optionsContainer" class="quiz-options-list"></div>
 
-                <button type="button" id="submitBtn"
-                        class="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled>
-                    Submit Answer
+            <!-- Submit -->
+            <button type="button" id="submitBtn" class="quiz-submit-btn emerald" disabled>
+                Submit Answer
+            </button>
+
+            <!-- Prev / Skip -->
+            <div class="quiz-nav-row">
+                <button type="button" id="prevBtn" class="quiz-nav-btn" disabled>
+                    <i class="bi bi-chevron-left"></i> Previous
                 </button>
-                <div class="quiz-nav-actions flex gap-2 mt-2">
-                    <button type="button" id="prevBtn"
-                            class="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition disabled:opacity-40"
-                            disabled>Previous</button>
-                    <button type="button" id="skipBtn"
-                            class="flex-1 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition">Skip</button>
-                </div>
-            </form>
+                <button type="button" id="skipBtn" class="quiz-nav-btn">
+                    Skip <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
 
-            <div id="feedback" class="mt-4 text-center font-bold text-lg"></div>
+            <!-- Feedback -->
+            <div id="feedback" class="quiz-feedback"></div>
+
         </div>
     </div>
 </div>
 
 @section Scripts {
 <script>
-    const questions = @Html.Raw(JsonSerializer.Serialize(Model));
-    let current = 0;
-    const total = questions.length;
-    const storageKey = 'readingQuizState_' + '@ViewBag.FormNumber';
-    let answers = Array(total).fill(null);
+const questions  = @Html.Raw(JsonSerializer.Serialize(Model));
+const total      = questions.length;
+const storageKey = 'readingQuizState_@ViewBag.FormNumber';
+let   current    = 0;
+let   answers    = Array(total).fill(null);
 
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-        try {
-            const s = JSON.parse(saved);
-            if (typeof s.current === 'number' && Array.isArray(s.answers)) {
-                current = Math.min(s.current, total - 1);
-                answers = s.answers.concat(Array(total - s.answers.length).fill(null)).slice(0, total);
-            }
-        } catch (e) { console.warn('Invalid saved quiz state', e); }
-    }
-
-    const gaugeFg = document.querySelector('.gauge-fg');
-    const gaugeText = document.getElementById('gauge-text');
-    const gaugeRadius = 45;
-    const gaugeCircumference = 2 * Math.PI * gaugeRadius;
-    const statsSummaryEl = document.getElementById('stats-summary');
-    const progressEl = document.getElementById('progress');
-    const questionTextEl = document.getElementById('question-text');
-    const optsContainer = document.getElementById('optionsContainer');
-    const submitBtn = document.getElementById('submitBtn');
-    const feedbackEl = document.getElementById('feedback');
-    const prevBtn = document.getElementById('prevBtn');
-    const skipBtn = document.getElementById('skipBtn');
-
-    function updateScoreSummary() {
-        const score = answers.reduce((acc, a) => acc + (a && a.submitted && a.correct ? 1 : 0), 0);
-        const asked = answers.reduce((acc, a) => acc + (a && a.submitted ? 1 : 0), 0);
-        const pct = total ? Math.round((score / total) * 100) : 0;
-        const offset = gaugeCircumference * (1 - score / total);
-        gaugeFg.style.strokeDashoffset = offset;
-        gaugeText.textContent = `${pct}%`;
-        statsSummaryEl.innerHTML = `Answered: ${asked} / ${total}<br/>Correct: ${score}<br/>Incorrect: ${asked - score}`;
-    }
-
-    function loadQuestion() {
-        feedbackEl.innerHTML = '';
-        submitBtn.textContent = 'Submit';
-        submitBtn.disabled = true;
-        optsContainer.innerHTML = '';
-        updateScoreSummary();
-
-        const q = questions[current];
-        progressEl.textContent = `Question ${current+1} of ${total}`;
-        questionTextEl.textContent = q.QuestionText;
-        prevBtn.disabled = current === 0;
-        saveState();
-
-        const savedAns = answers[current];
-        ['OptionA','OptionB','OptionC','OptionD'].forEach((optKey, idx) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'quiz-option';
-            btn.textContent = q[optKey];
-            btn.dataset.value = idx+1;
-            btn.addEventListener('click', () => selectOption(btn));
-            optsContainer.appendChild(btn);
-        });
-
-        if (savedAns) {
-            if (savedAns.choice) {
-                const btn = optsContainer.children[savedAns.choice - 1];
-                if (btn) btn.classList.add('active');
-                if (!savedAns.submitted) submitBtn.disabled = false;
-            }
-            if (savedAns.submitted) {
-                const choice = savedAns.choice;
-                if (choice) {
-                    const sel = optsContainer.children[choice - 1];
-                    if (sel) {
-                        sel.classList.remove('active');
-                        sel.classList.add(savedAns.correct ? 'correct' : 'wrong');
-                    }
-                }
-                if (!savedAns.correct) {
-                    const correctBtn = optsContainer.children[questions[current].CorrectOption - 1];
-                    if (correctBtn) correctBtn.classList.add('correct');
-                }
-                feedbackEl.innerHTML = savedAns.correct
-                    ? '<span class="text-green-600">Correct!</span>'
-                    : `<span class="text-red-600">Wrong! Correct: ${optsContainer.children[questions[current].CorrectOption-1].textContent}</span>`;
-                submitBtn.textContent = current+1 < total ? 'Next' : 'Finish';
-                submitBtn.removeEventListener('click', submitHandler);
-                submitBtn.addEventListener('click', nextHandler);
-            }
+/* ── Restore saved state ─────────────────────────────────────── */
+try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) {
+        const s = JSON.parse(raw);
+        if (typeof s.current === 'number' && Array.isArray(s.answers)) {
+            current = Math.min(s.current, total - 1);
+            answers = s.answers
+                .concat(Array(Math.max(0, total - s.answers.length)).fill(null))
+                .slice(0, total);
         }
     }
+} catch (_) {}
 
-    function selectOption(btn) {
-        Array.from(optsContainer.children).forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        submitBtn.disabled = false;
-        const choice = parseInt(btn.dataset.value);
-        answers[current] = answers[current] || { choice: null, submitted: false, correct: null };
-        answers[current].choice = choice;
-        saveState();
+/* ── DOM ─────────────────────────────────────────────────────── */
+const progressEl = document.getElementById('progress-text');
+const statsEl    = document.getElementById('stats-summary');
+const gaugeFg    = document.querySelector('.gauge-fg');
+const gaugeText  = document.getElementById('gauge-text');
+const qTextEl    = document.getElementById('question-text');
+const optsEl     = document.getElementById('optionsContainer');
+const submitBtn  = document.getElementById('submitBtn');
+const feedbackEl = document.getElementById('feedback');
+const prevBtn    = document.getElementById('prevBtn');
+const skipBtn    = document.getElementById('skipBtn');
+
+const CIRC = 2 * Math.PI * 45;
+
+/* ── State helpers ───────────────────────────────────────────── */
+function saveState() {
+    try { localStorage.setItem(storageKey, JSON.stringify({ current, answers })); } catch (_) {}
+}
+
+function updateGauge() {
+    const score = answers.reduce((n, a) => n + (a?.submitted && a?.correct ? 1 : 0), 0);
+    const asked = answers.reduce((n, a) => n + (a?.submitted ? 1 : 0), 0);
+    const pct   = total ? Math.round((score / total) * 100) : 0;
+    gaugeFg.style.strokeDashoffset = CIRC * (1 - score / total);
+    gaugeFg.style.stroke = pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#f43f5e';
+    gaugeText.textContent = pct + '%';
+    statsEl.innerHTML =
+        `Answered: <strong>${asked}/${total}</strong><br>` +
+        `<span style="color:#10b981">✓ ${score}</span> &nbsp;` +
+        `<span style="color:#f43f5e">✗ ${asked - score}</span>`;
+}
+
+/* ── Load question ───────────────────────────────────────────── */
+function loadQuestion() {
+    feedbackEl.innerHTML  = '';
+    optsEl.innerHTML      = '';
+    submitBtn.textContent = 'Submit Answer';
+    submitBtn.disabled    = true;
+    submitBtn.onclick     = null;
+    updateGauge();
+
+    const q = questions[current];
+    progressEl.textContent = `Question ${current + 1} of ${total}`;
+    qTextEl.textContent    = q.QuestionText;
+    prevBtn.disabled        = current === 0;
+
+    const letters = ['A','B','C','D'];
+    ['OptionA','OptionB','OptionC','OptionD'].forEach((k, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'quiz-option';
+        btn.dataset.label = letters[i];
+        btn.dataset.value = i + 1;
+        btn.textContent   = q[k];
+        btn.addEventListener('click', () => selectOption(btn));
+        optsEl.appendChild(btn);
+    });
+
+    const ans = answers[current];
+    if (ans?.choice && !ans.submitted) {
+        const b = optsEl.children[ans.choice - 1];
+        if (b) { b.classList.add('active'); enableSubmit(); }
     }
+    if (ans?.submitted) {
+        applyResult(ans);
+        submitBtn.textContent = current + 1 < total ? 'Next →' : 'Finish';
+        submitBtn.disabled    = false;
+        submitBtn.onclick     = nextHandler;
+    }
+    saveState();
+}
 
-    submitBtn.addEventListener('click', () => {
-        const selectedBtn = optsContainer.querySelector('.active');
-        const choice = parseInt(selectedBtn.dataset.value);
-        const correct = questions[current].CorrectOption;
-        if (choice === correct) {
-            selectedBtn.classList.remove('active');
-            selectedBtn.classList.add('correct');
-            feedbackEl.innerHTML = '<span class="text-green-600">Correct!</span>';
-            answers[current] = answers[current] || { choice: null, submitted: false, correct: null };
-            if (!answers[current].submitted) answers[current].submitted = true;
-            answers[current].correct = true;
-        } else {
-            selectedBtn.classList.remove('active');
-            selectedBtn.classList.add('wrong');
-            const correctBtn = optsContainer.children[correct-1];
-            correctBtn.classList.add('correct');
-            feedbackEl.innerHTML = `<span class="text-red-600">Wrong! Correct: ${correctBtn.textContent}</span>`;
-            answers[current] = answers[current] || { choice: null, submitted: false, correct: null };
-            if (!answers[current].submitted) answers[current].submitted = true;
-            answers[current].correct = false;
+function selectOption(btn) {
+    Array.from(optsEl.children).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (!answers[current]) answers[current] = { choice: null, submitted: false, correct: null };
+    answers[current].choice = parseInt(btn.dataset.value);
+    enableSubmit();
+    saveState();
+}
+
+function enableSubmit() {
+    submitBtn.disabled = false;
+    submitBtn.onclick  = submitHandler;
+}
+
+function submitHandler() {
+    const active = optsEl.querySelector('.active');
+    if (!active) return;
+    const choice  = parseInt(active.dataset.value);
+    const correct = questions[current].CorrectOption;
+    answers[current] = { choice, submitted: true, correct: choice === correct };
+    applyResult(answers[current]);
+    updateGauge();
+    saveState();
+    submitBtn.textContent = current + 1 < total ? 'Next →' : 'Finish';
+    submitBtn.disabled    = false;
+    submitBtn.onclick     = nextHandler;
+}
+
+function applyResult(ans) {
+    const sel = ans.choice ? optsEl.children[ans.choice - 1] : null;
+    const cor = optsEl.children[questions[current].CorrectOption - 1];
+    Array.from(optsEl.children).forEach(b => b.classList.remove('active'));
+    if (sel) sel.classList.add(ans.correct ? 'correct' : 'wrong');
+    if (!ans.correct && cor) cor.classList.add('correct');
+    feedbackEl.innerHTML = ans.correct
+        ? '<span style="color:#10b981;font-size:1.05rem">✓ Correct!</span>'
+        : `<span style="color:#f43f5e">✗ Wrong — Correct: <strong>${cor?.textContent ?? ''}</strong></span>`;
+}
+
+function nextHandler() {
+    current++;
+    if (current < total) {
+        loadQuestion();
+    } else {
+        const score = answers.reduce((n, a) => n + (a?.submitted && a?.correct ? 1 : 0), 0);
+        const pct   = Math.round((score / total) * 100);
+        if (confirm(`Quiz complete!\n\nScore: ${score} / ${total}  (${pct}%)\n\nReturn to quiz list?`)) {
+            window.location.href = '@Url.Action("StartQuiz")';
         }
-        updateScoreSummary();
-        saveState();
-        submitBtn.textContent = current+1 < total ? 'Next' : 'Finish';
-        submitBtn.disabled = false;
-        submitBtn.removeEventListener('click', submitHandler);
-        submitBtn.addEventListener('click', nextHandler);
-    });
-
-    function submitHandler() {}
-
-    function nextHandler() {
-        current++;
-        if (current < total) {
-            submitBtn.removeEventListener('click', nextHandler);
-            submitBtn.addEventListener('click', submitHandler);
-            loadQuestion();
-        } else {
-            const score = answers.reduce((acc, a) => acc + (a && a.submitted && a.correct ? 1 : 0), 0);
-            const pct = total ? Math.round((score / total) * 100) : 0;
-            if (confirm(`Quiz complete!\nScore: ${score}/${total} (${pct}%)\nReturn to Start Quiz?`)) {
-                window.location.href = '@Url.Action("StartQuiz")';
-            }
-        }
     }
+}
 
-    prevBtn.addEventListener('click', () => {
-        if (current > 0) { current--; saveState(); loadQuestion(); }
-    });
+prevBtn.addEventListener('click', () => {
+    if (current > 0) { current--; saveState(); loadQuestion(); }
+});
+skipBtn.addEventListener('click', () => {
+    if (!answers[current]) answers[current] = { choice: null, submitted: false, correct: null };
+    if (current < total - 1) { current++; saveState(); loadQuestion(); }
+});
 
-    skipBtn.addEventListener('click', () => {
-        answers[current] = answers[current] || { choice: null, submitted: false, correct: null };
-        if (current < total - 1) { current++; saveState(); loadQuestion(); }
-    });
-
-    function saveState() {
-        try { localStorage.setItem(storageKey, JSON.stringify({ current, answers })); }
-        catch (e) { console.warn('Could not save quiz state', e); }
-    }
-
-    loadQuestion();
-    submitBtn.addEventListener('click', submitHandler);
+loadQuestion();
 </script>
 }

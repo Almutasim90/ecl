@@ -1,95 +1,105 @@
-// drawer.js - modular drawer toggle
-// Features:
-// - Toggles `body.drawer-open` to show/hide the left drawer
-// - Updates ARIA attributes on the toggle button
-// - Persists state in localStorage (optional)
-// - Ensures responsive default (closed on small screens)
+// drawer.js — sidebar toggle for mobile/tablet (<1024px overlay mode)
+// On desktop (≥1024px) the sidebar is always visible in normal flex flow;
+// this script only activates the overlay drawer on smaller screens.
 
 const STORAGE_KEY = 'ecl.drawer.open';
+const DESKTOP_BP  = 1024; // px — must match the CSS media query breakpoint
 
-function isMobile() {
-  return window.matchMedia('(max-width: 767.98px)').matches;
+function isDesktop() {
+  return window.matchMedia(`(min-width: ${DESKTOP_BP}px)`).matches;
 }
 
 function setDrawerOpen(open, { save = true } = {}) {
-  const body = document.body;
-  const toggle = document.getElementById('drawer-toggle');
-  if (!toggle) return;
+  const body     = document.body;
+  const toggle   = document.getElementById('drawer-toggle');
+  const backdrop = document.getElementById('sidebar-backdrop');
+
   if (open) {
     body.classList.add('drawer-open');
-    toggle.setAttribute('aria-expanded', 'true');
-    toggle.querySelector('i')?.classList.replace('bi-list', 'bi-x');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.querySelector('i')?.classList.replace('bi-list', 'bi-x');
+    }
   } else {
     body.classList.remove('drawer-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.querySelector('i')?.classList.replace('bi-x', 'bi-list');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.querySelector('i')?.classList.replace('bi-x', 'bi-list');
+    }
   }
-  if (save) {
-    try { localStorage.setItem(STORAGE_KEY, open ? '1' : '0'); } catch (e) { }
+
+  if (save && !isDesktop()) {
+    try { localStorage.setItem(STORAGE_KEY, open ? '1' : '0'); } catch (e) { /* ignore */ }
   }
 }
 
 function toggleDrawer() {
-  const isOpen = document.body.classList.contains('drawer-open');
-  setDrawerOpen(!isOpen);
+  setDrawerOpen(!document.body.classList.contains('drawer-open'));
 }
 
 function initDrawer() {
-  const toggle = document.getElementById('drawer-toggle');
-  const sidebar = document.getElementById('sidebar');
+  const toggle   = document.getElementById('drawer-toggle');
+  const sidebar  = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+
   if (!toggle || !sidebar) return;
 
-  // Click handler
+  // Hamburger click
   toggle.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleDrawer();
   });
 
-  // Clicking outside closes the drawer on mobile
-  document.addEventListener('click', (e) => {
-    if (!document.body.classList.contains('drawer-open')) return;
-    if (!isMobile()) return; // only for mobile overlay
-    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
-      setDrawerOpen(false);
-    }
-  });
+  // Backdrop click closes drawer
+  if (backdrop) {
+    backdrop.addEventListener('click', () => setDrawerOpen(false));
+  }
 
-  // Escape key closes
+  // Escape key closes drawer
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && document.body.classList.contains('drawer-open')) {
       setDrawerOpen(false);
     }
   });
 
-  // Initialize state: prefer stored state on desktop; close on mobile by default
-  let open = null;
-  try { open = localStorage.getItem(STORAGE_KEY); } catch (e) { /* ignore */ }
-  if (isMobile()) {
-    setDrawerOpen(false, { save: false });
-  } else if (open !== null) {
-    setDrawerOpen(open === '1', { save: false });
+  // Initial state
+  if (isDesktop()) {
+    // Desktop: ensure drawer-open class is removed (sidebar is always visible via CSS)
+    body_classList_remove_drawer_open();
   } else {
-    // default open on desktop
-    setDrawerOpen(true, { save: false });
+    // Mobile/tablet: restore saved state, default closed
+    let saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+    setDrawerOpen(saved === '1', { save: false });
   }
 
-  // Keep drawer state reasonable when resizing
-  let lastIsMobile = isMobile();
+  // Handle browser resize across the breakpoint
+  let wasDesktop = isDesktop();
   window.addEventListener('resize', () => {
-    const nowIsMobile = isMobile();
-    if (nowIsMobile !== lastIsMobile) {
-      if (nowIsMobile) {
-        setDrawerOpen(false, { save: false });
-      } else {
-        // restore saved state or open by default on larger screens
-        let saved = null;
-        try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { }
-        if (saved !== null) setDrawerOpen(saved === '1', { save: false });
-        else setDrawerOpen(true, { save: false });
-      }
-      lastIsMobile = nowIsMobile;
+    const nowDesktop = isDesktop();
+    if (nowDesktop === wasDesktop) return;
+    wasDesktop = nowDesktop;
+
+    if (nowDesktop) {
+      // Switched to desktop — remove overlay state; CSS makes sidebar always visible
+      setDrawerOpen(false, { save: false });
+    } else {
+      // Switched to mobile/tablet — restore saved state, default closed
+      let saved = null;
+      try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+      setDrawerOpen(saved === '1', { save: false });
     }
   });
+}
+
+function body_classList_remove_drawer_open() {
+  document.body.classList.remove('drawer-open');
+  const toggle = document.getElementById('drawer-toggle');
+  if (toggle) {
+    toggle.setAttribute('aria-expanded', 'false');
+    const icon = toggle.querySelector('i');
+    if (icon) { icon.classList.remove('bi-x'); icon.classList.add('bi-list'); }
+  }
 }
 
 if (document.readyState === 'loading') {

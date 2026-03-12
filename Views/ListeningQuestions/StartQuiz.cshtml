@@ -1,32 +1,35 @@
 @model List<int>
 @{
-    ViewData["Title"] = "Start Listening Quiz";
+    ViewData["Title"] = "Listening Quiz";
 }
 
 @if (TempData["DbError"] != null)
 {
-    <div class="alert-error mb-5">
+    <div class="alert-error">
         <strong>Database Error:</strong> @TempData["DbError"]
-        <br/><small>Check that the database is connected and contains data.</small>
+        <br /><small>Check that the database is connected and contains data.</small>
     </div>
 }
 
 @if (!Model.Any())
 {
     <div class="alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
         No quiz forms available. The database may be empty or unreachable.
     </div>
 }
 else
 {
-    <p class="text-sm text-gray-400 mb-5">Choose a form to begin your listening practice session.</p>
-    <div class="quiz-form-grid grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <p style="font-size:.82rem;color:var(--t3);margin-bottom:16px">
+        Choose a form to begin your listening practice session.
+    </p>
+    <div class="form-grid">
         @foreach (var num in Model)
         {
-            <a asp-action="Quiz" asp-route-formNumber="@num" class="quiz-form-card no-underline">
-                <div class="form-number" style="background:#eff6ff;color:#2563eb">@num</div>
-                <div class="text-sm font-semibold text-gray-700">Form @num</div>
-                <div class="text-xs text-blue-500 font-medium mt-1">
+            <a asp-action="Quiz" asp-route-formNumber="@num" class="form-grid-card">
+                <div class="form-num" style="background:#eff6ff;color:#2563eb">@num</div>
+                <div class="form-grid-card-label">Form @num</div>
+                <div class="form-grid-card-cta">
                     <i class="bi bi-play-fill"></i> Start
                 </div>
             </a>
