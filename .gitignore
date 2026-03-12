@@ -1,3 +1,23 @@
 App_Data/*.db
 App_Data/*.db-shm
 App_Data/*.db-wal
+
+# Build output
+bin/
+obj/
+
+# Node
+node_modules/
+package-lock.json
+
+# User-specific files
+*.user
+.env
+.env.local
+
+# IDE
+.vs/
+.vscode/
+
+# Nested project copy
+ecl/
