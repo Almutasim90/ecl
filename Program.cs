@@ -25,17 +25,23 @@ builder.Services.AddCors(options =>
 // ── Database ──────────────────────────────────────────────────────────────
 // In production: DATABASE_URL env var (PostgreSQL Npgsql connection string).
 // In development: fall back to SQLite for local work.
+var envDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 var connectionString =
-    Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Data Source=App_Data/ecl.db";
+    !string.IsNullOrWhiteSpace(envDbUrl) ? envDbUrl
+    : builder.Configuration.GetConnectionString("DefaultConnection")
+      ?? "Data Source=App_Data/ecl.db";
 
 var appDataDirectory = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
 Directory.CreateDirectory(appDataDirectory);
 
-if (connectionString.StartsWith("Host=", StringComparison.OrdinalIgnoreCase)
-    || connectionString.StartsWith("Server=", StringComparison.OrdinalIgnoreCase)
-    || connectionString.Contains("postgresql", StringComparison.OrdinalIgnoreCase))
+static bool IsPostgres(string cs) =>
+    cs.StartsWith("Host=", StringComparison.OrdinalIgnoreCase) ||
+    cs.StartsWith("Server=", StringComparison.OrdinalIgnoreCase) ||
+    cs.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+    cs.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) ||
+    cs.Contains("postgresql", StringComparison.OrdinalIgnoreCase);
+
+if (IsPostgres(connectionString))
 {
     builder.Services.AddDbContext<ApplicationDbContext>(o => o
         .UseNpgsql(connectionString)
