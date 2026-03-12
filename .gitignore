@@ -8,7 +8,6 @@ obj/
 
 # Node
 node_modules/
-package-lock.json
 
 # User-specific files
 *.user
