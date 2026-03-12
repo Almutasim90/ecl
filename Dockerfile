@@ -2,9 +2,10 @@
 FROM node:20-alpine AS node-build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+# Robust: Uses 'npm ci' if lock file exists, 'npm install' if it doesn't
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY . .
-RUN npm run build  # Assuming you have a build script in package.json
+RUN npm run build
 
 # ── Stage 2: Build Backend (.NET) ──────────────────────────────────
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dotnet-build
@@ -12,7 +13,8 @@ WORKDIR /src
 COPY ["ECL.csproj", "./"]
 RUN dotnet restore
 COPY . .
-# Copy frontend assets from the node-build stage
+# Copy the compiled frontend assets from the node-build stage
+# Adjust '/app/dist' or '/app/wwwroot' to match your frontend build output
 COPY --from=node-build /app/wwwroot ./wwwroot
 RUN dotnet publish -c Release -o /app/publish
 
@@ -25,7 +27,7 @@ COPY --from=dotnet-build /app/publish .
 RUN mkdir -p /app/App_Data
 VOLUME ["/app/App_Data"]
 
-# Connection via Environment Variable
+# Default settings
 ENV ConnectionStrings__DefaultConnection="Data Source=/app/App_Data/ecl.db"
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
