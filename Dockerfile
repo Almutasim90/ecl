@@ -14,7 +14,7 @@ RUN dotnet restore
 
 # Install npm deps and build CSS
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+RUN npm ci
 COPY tailwind.config.js ./
 COPY wwwroot/css/app.css ./wwwroot/css/app.css
 COPY Views ./Views
