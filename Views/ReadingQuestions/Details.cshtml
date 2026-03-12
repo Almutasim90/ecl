@@ -4,8 +4,7 @@
     ViewData["Title"] = "Reading Question Details";
 }
 
-<div class="max-w-lg">
-    <div class="form-card">
+<div class="form-card">
         <div class="form-card-header">
             <div class="form-card-icon green"><i class="bi bi-journal-text"></i></div>
             <div>
@@ -45,13 +44,12 @@
             </div>
 
             <div class="form-actions mt-5">
-                <a asp-action="Edit" asp-route-id="@Model?.Qno" class="btn-success">
+                <a asp-action="Edit" asp-route-id="@Model?.Qno" class="btn btn-success">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
-                <a asp-action="Index" class="btn-ghost">
+                <a asp-action="Index" class="btn btn-ghost">
                     <i class="bi bi-arrow-left"></i> Back
                 </a>
             </div>
         </div>
-    </div>
 </div>

@@ -20,14 +20,14 @@
 }
 else
 {
-    <p style="font-size:.82rem;color:var(--t3);margin-bottom:16px">
+    <p class="muted-note">
         Choose a form to begin your reading practice session.
     </p>
     <div class="form-grid">
         @foreach (var num in Model)
         {
             <a asp-action="Quiz" asp-route-formNumber="@num" class="form-grid-card green">
-                <div class="form-num" style="background:#ecfdf5;color:#059669">@num</div>
+                <div class="form-num green">@num</div>
                 <div class="form-grid-card-label">Form @num</div>
                 <div class="form-grid-card-cta">
                     <i class="bi bi-play-fill"></i> Start

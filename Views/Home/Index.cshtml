@@ -3,9 +3,9 @@
 }
 
 <!-- Quick-access stat cards -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<div class="dashboard-stats">
     <a asp-controller="ListeningQuestions" asp-action="Index" class="stat-card">
-        <div class="stat-card-icon" style="background:#eff6ff;color:#2563eb">
+        <div class="stat-card-icon icon-pill blue">
             <i class="bi bi-headphones"></i>
         </div>
         <div>
@@ -14,7 +14,7 @@
         </div>
     </a>
     <a asp-controller="ReadingQuestions" asp-action="Index" class="stat-card">
-        <div class="stat-card-icon" style="background:#ecfdf5;color:#059669">
+        <div class="stat-card-icon icon-pill green">
             <i class="bi bi-journal-text"></i>
         </div>
         <div>
@@ -23,7 +23,7 @@
         </div>
     </a>
     <a asp-controller="ListeningQuestions" asp-action="StartQuiz" class="stat-card">
-        <div class="stat-card-icon" style="background:#f5f3ff;color:#7c3aed">
+        <div class="stat-card-icon icon-pill purple">
             <i class="bi bi-headphones-simple"></i>
         </div>
         <div>
@@ -32,7 +32,7 @@
         </div>
     </a>
     <a asp-controller="ReadingQuestions" asp-action="StartQuiz" class="stat-card">
-        <div class="stat-card-icon" style="background:#fff7ed;color:#ea580c">
+        <div class="stat-card-icon icon-pill orange">
             <i class="bi bi-book-open"></i>
         </div>
         <div>
@@ -43,10 +43,10 @@
 </div>
 
 <!-- Feature cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="dashboard-panels">
     <div class="info-card">
         <div class="info-card-title">
-            <span style="width:34px;height:34px;background:#eff6ff;color:#2563eb;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
+            <span class="icon-pill blue">
                 <i class="bi bi-headphones"></i>
             </span>
             Listening Quiz
@@ -61,7 +61,7 @@
     </div>
     <div class="info-card">
         <div class="info-card-title">
-            <span style="width:34px;height:34px;background:#ecfdf5;color:#059669;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
+            <span class="icon-pill green">
                 <i class="bi bi-book-open"></i>
             </span>
             Reading Quiz

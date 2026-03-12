@@ -4,8 +4,7 @@
     ViewData["Title"] = "Delete Reading Question";
 }
 
-<div class="max-w-lg">
-    <div class="form-card">
+<div class="form-card">
         <div class="form-card-header">
             <div class="form-card-icon red"><i class="bi bi-trash3"></i></div>
             <div>
@@ -50,13 +49,12 @@
 
             <form asp-action="Delete" class="form-actions mt-5">
                 <input type="hidden" asp-for="Qno" />
-                <button type="submit" class="btn-danger">
+                <button type="submit" class="btn btn-danger">
                     <i class="bi bi-trash3"></i> Yes, Delete
                 </button>
-                <a asp-action="Index" class="btn-ghost">
+                <a asp-action="Index" class="btn btn-ghost">
                     <i class="bi bi-arrow-left"></i> Cancel
                 </a>
             </form>
         </div>
-    </div>
 </div>

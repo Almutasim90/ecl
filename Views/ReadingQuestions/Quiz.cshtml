@@ -108,8 +108,8 @@ function updateGauge() {
     gaugeText.textContent = pct + '%';
     statsEl.innerHTML =
         `Answered: <strong>${asked}/${total}</strong><br>` +
-        `<span style="color:#10b981">✓ ${score}</span> &nbsp;` +
-        `<span style="color:#f43f5e">✗ ${asked - score}</span>`;
+        `<span class="quiz-score-ok">✓ ${score}</span> &nbsp;` +
+        `<span class="quiz-score-bad">✗ ${asked - score}</span>`;
 }
 
 /* ── Load question ───────────────────────────────────────────── */
@@ -187,8 +187,8 @@ function applyResult(ans) {
     if (sel) sel.classList.add(ans.correct ? 'correct' : 'wrong');
     if (!ans.correct && cor) cor.classList.add('correct');
     feedbackEl.innerHTML = ans.correct
-        ? '<span style="color:#10b981;font-size:1.05rem">✓ Correct!</span>'
-        : `<span style="color:#f43f5e">✗ Wrong — Correct: <strong>${cor?.textContent ?? ''}</strong></span>`;
+        ? '<span class="quiz-score-ok">✓ Correct!</span>'
+        : `<span class="quiz-score-bad">✗ Wrong — Correct: <strong>${cor?.textContent ?? ''}</strong></span>`;
 }
 
 function nextHandler() {
