@@ -23,27 +23,14 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-// Production: always PostgreSQL. Development: SQLite fallback.
-var appDataDirectory = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
-Directory.CreateDirectory(appDataDirectory);
-
+// Always PostgreSQL (Supabase) — both development and production.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Data Source=App_Data/ecl.db";
+    ?? throw new InvalidOperationException("DefaultConnection is not configured.");
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(o => o
-        .UseNpgsql(connectionString)
-        .ConfigureWarnings(w => w.Ignore(
-            Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
-}
-else
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(o => o
-        .UseSqlite(connectionString)
-        .ConfigureWarnings(w => w.Ignore(
-            Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
-}
+builder.Services.AddDbContext<ApplicationDbContext>(o => o
+    .UseNpgsql(connectionString)
+    .ConfigureWarnings(w => w.Ignore(
+        Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
 // ── JWT Auth (Supabase GoTrue) ────────────────────────────────────────────
 var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
@@ -90,14 +77,7 @@ builder.Services.AddRateLimiter(o =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // SQLite (local dev): run migrations to create tables automatically.
-    // PostgreSQL (Supabase): tables already exist — skip migrations.
-    if (db.Database.IsSqlite())
-        db.Database.Migrate();
-}
+// Tables managed in Supabase — no automatic migrations.
 
 // ── HTTP pipeline ─────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
