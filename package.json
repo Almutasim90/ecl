@@ -1,0 +1,25 @@
+{
+  "name": "ecl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "css:build": "npx tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/site.css --minify",
+    "css:watch": "npx tailwindcss -i ./wwwroot/css/app.css -o ./wwwroot/css/site.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Almutasim90/ecl.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Almutasim90/ecl/issues"
+  },
+  "homepage": "https://github.com/Almutasim90/ecl#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
