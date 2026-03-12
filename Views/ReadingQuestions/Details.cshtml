@@ -5,42 +5,53 @@
 }
 
 <div class="max-w-lg">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Reading Question Details</h1>
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-icon green"><i class="bi bi-journal-text"></i></div>
+            <div>
+                <div class="form-card-title">Reading Question <span class="text-green-600">#@Model.Qno</span></div>
+                <div class="form-card-subtitle">Form @Html.DisplayFor(m => m.FormNumber)</div>
+            </div>
+        </div>
 
-    <div class="bg-white rounded-xl shadow p-6 space-y-3">
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.FormNumber)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.FormNumber)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.QuestionText)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.QuestionText)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionA)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionA)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionB)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionB)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionC)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionC)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionD)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionD)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.CorrectOption)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.CorrectOption)</dd>
-        </div>
-    </div>
+        <div class="form-card-body">
+            <div class="detail-row">
+                <span class="detail-key">Form #</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.FormNumber)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Question</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.QuestionText)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option A</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionA)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option B</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionB)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option C</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionC)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option D</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionD)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Correct Answer</span>
+                <span class="detail-val">Option @Model.CorrectOption</span>
+            </div>
 
-    <div class="flex gap-4 mt-4">
-        <a asp-action="Edit" asp-route-id="@Model?.Qno"
-           class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">Edit</a>
-        <a asp-action="Index" class="text-gray-500 hover:text-gray-700 text-sm self-center">Back to List</a>
+            <div class="form-actions mt-5">
+                <a asp-action="Edit" asp-route-id="@Model?.Qno" class="btn-success">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a asp-action="Index" class="btn-ghost">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </div>
     </div>
 </div>

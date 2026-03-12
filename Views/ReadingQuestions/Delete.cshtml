@@ -5,44 +5,58 @@
 }
 
 <div class="max-w-lg">
-    <h1 class="text-2xl font-bold text-gray-800 mb-2">Delete</h1>
-    <p class="text-red-600 font-medium mb-6">Are you sure you want to delete this question?</p>
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="form-card-icon red"><i class="bi bi-trash3"></i></div>
+            <div>
+                <div class="form-card-title">Delete Reading Question <span class="text-red-500">#@Model.Qno</span></div>
+                <div class="form-card-subtitle text-red-400">This action cannot be undone.</div>
+            </div>
+        </div>
 
-    <div class="bg-white rounded-xl shadow p-6 space-y-3 mb-6">
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.FormNumber)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.FormNumber)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.QuestionText)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.QuestionText)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionA)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionA)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionB)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionB)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionC)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionC)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2 border-b border-gray-100 pb-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.OptionD)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.OptionD)</dd>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-            <dt class="text-sm font-medium text-gray-500">@Html.DisplayNameFor(m => m.CorrectOption)</dt>
-            <dd class="col-span-2 text-sm text-gray-900">@Html.DisplayFor(m => m.CorrectOption)</dd>
+        <div class="form-card-body">
+            <div class="alert-warning mb-4">
+                Are you sure you want to permanently delete this reading question?
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-key">Form #</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.FormNumber)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Question</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.QuestionText)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option A</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionA)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option B</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionB)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option C</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionC)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Option D</span>
+                <span class="detail-val">@Html.DisplayFor(m => m.OptionD)</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-key">Correct Answer</span>
+                <span class="detail-val">Option @Model.CorrectOption</span>
+            </div>
+
+            <form asp-action="Delete" class="form-actions mt-5">
+                <input type="hidden" asp-for="Qno" />
+                <button type="submit" class="btn-danger">
+                    <i class="bi bi-trash3"></i> Yes, Delete
+                </button>
+                <a asp-action="Index" class="btn-ghost">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+            </form>
         </div>
     </div>
-
-    <form asp-action="Delete" class="flex items-center gap-4">
-        <input type="hidden" asp-for="Qno" />
-        <input type="submit" value="Delete"
-               class="px-5 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition cursor-pointer" />
-        <a asp-action="Index" class="text-gray-500 hover:text-gray-700 text-sm">Back to List</a>
-    </form>
 </div>

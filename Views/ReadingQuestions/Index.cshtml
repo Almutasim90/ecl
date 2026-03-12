@@ -2,16 +2,18 @@
     ViewData["Title"] = "Reading Questions";
 }
 
-<div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Reading Questions</h1>
-    <a asp-action="Create"
-       class="inline-flex items-center gap-1 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 transition text-sm">
-        <span class="material-icons text-sm">add</span> Create New
+<div class="page-title-row">
+    <div>
+        <h1 class="text-xl font-bold text-gray-800">Reading Questions</h1>
+        <p class="text-sm text-gray-400 mt-0.5">Browse and manage all reading comprehension questions.</p>
+    </div>
+    <a asp-action="Create" class="btn-success">
+        <span class="material-icons" style="font-size:16px">add</span> Create New
     </a>
 </div>
 
-<div class="overflow-x-auto rounded-lg shadow">
-    <table id="ReadingTable" class="display material hover stripe w-full">
+<div class="table-card">
+    <table id="ReadingTable" class="display hover stripe w-full">
         <thead>
             <tr>
                 <th>Q#</th>
@@ -66,11 +68,13 @@
                     title:      'Actions',
                     orderable:  false,
                     searchable: false,
-                    width:      '160px',
+                    width:      '100px',
                     render: function (id) {
-                        return '<a class="btn btn-sm btn-outline-primary me-1"   href="/ReadingQuestions/Details/' + id + '" title="View"><span class="material-icons" style="font-size:16px">visibility</span></a>' +
-                               '<a class="btn btn-sm btn-outline-secondary me-1" href="/ReadingQuestions/Edit/'    + id + '" title="Edit"><span class="material-icons" style="font-size:16px">edit</span></a>' +
-                               '<a class="btn btn-sm btn-outline-danger"          href="/ReadingQuestions/Delete/'  + id + '" title="Delete"><span class="material-icons" style="font-size:16px">delete</span></a>';
+                        return '<div style="display:flex;gap:5px">' +
+                               '<a class="dt-btn dt-btn-view" href="/ReadingQuestions/Details/' + id + '" title="View"><span class="material-icons" style="font-size:15px">visibility</span></a>' +
+                               '<a class="dt-btn dt-btn-edit"  href="/ReadingQuestions/Edit/'    + id + '" title="Edit"><span class="material-icons" style="font-size:15px">edit</span></a>' +
+                               '<a class="dt-btn dt-btn-delete" href="/ReadingQuestions/Delete/' + id + '" title="Delete"><span class="material-icons" style="font-size:15px">delete</span></a>' +
+                               '</div>';
                     }
                 }
             ],

@@ -3,32 +3,34 @@
     ViewData["Title"] = "Start Reading Quiz";
 }
 
-<h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Start Reading Quiz</h1>
-
 @if (TempData["DbError"] != null)
 {
-    <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded mb-4">
-        <strong>⚠️ Database Error:</strong> @TempData["DbError"]
+    <div class="alert-error mb-5">
+        <strong>Database Error:</strong> @TempData["DbError"]
         <br/><small>Check that the database is connected and contains data.</small>
     </div>
 }
 
 @if (!Model.Any())
 {
-    <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4 text-center">
+    <div class="alert-warning">
         No quiz forms available. The database may be empty or unreachable.
     </div>
 }
+else
+{
+    <p class="text-sm text-gray-400 mb-5">Choose a form to begin your reading practice session.</p>
 
-<div class="quiz-form-grid grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-    @foreach (var num in Model)
-    {
-        <div class="bg-white rounded-xl shadow-md p-6 flex flex-col items-center justify-center hover:shadow-lg transition">
-            <h2 class="text-xl font-bold text-gray-700 mb-3">Form @num</h2>
-            <a asp-action="Quiz" asp-route-formNumber="@num"
-               class="px-5 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition">
-                Start Form @num
+    <div class="quiz-form-grid grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        @foreach (var num in Model)
+        {
+            <a asp-action="Quiz" asp-route-formNumber="@num" class="quiz-form-card no-underline">
+                <div class="form-number" style="background:#f0fdf4;color:#16a34a">@num</div>
+                <div class="text-sm font-semibold text-gray-700">Form @num</div>
+                <div class="text-xs text-green-600 font-medium mt-1">
+                    <i class="bi bi-play-fill"></i> Start
+                </div>
             </a>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
