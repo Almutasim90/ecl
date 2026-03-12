@@ -31,9 +31,5 @@
    
   </ItemGroup>
 
-  <!-- Build Tailwind CSS before dotnet publish (CI/Docker) -->
-  <Target Name="BuildTailwind" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
-    <Exec Command="npm run css:build" WorkingDirectory="$(MSBuildProjectDirectory)" />
-  </Target>
 
 </Project>
