@@ -1,6 +1,52 @@
+@model ECL.Models.DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
 }
+
+<!-- Statistics cards -->
+<section class="dashboard-stats-section" aria-label="Overview statistics">
+    <h2 class="stats-section-title">Overview</h2>
+    <div class="stats-cards-grid">
+        <div class="stat-number-card stat-number-card--violet">
+            <div class="stat-number-card__icon">
+                <i class="bi bi-collection-fill"></i>
+            </div>
+            <div class="stat-number-card__content">
+                <span class="stat-number-card__value">@Model.TotalQuestionsCount</span>
+                <span class="stat-number-card__label">Total Questions</span>
+            </div>
+        </div>
+        <a asp-controller="ListeningQuestions" asp-action="Index" class="stat-number-card stat-number-card--blue">
+            <div class="stat-number-card__icon">
+                <i class="bi bi-headphones"></i>
+            </div>
+            <div class="stat-number-card__content">
+                <span class="stat-number-card__value">@Model.ListeningQuestionsCount</span>
+                <span class="stat-number-card__label">Listening Questions</span>
+            </div>
+            <span class="stat-number-card__meta">@Model.ListeningFormsCount form(s)</span>
+        </a>
+        <a asp-controller="ReadingQuestions" asp-action="Index" class="stat-number-card stat-number-card--emerald">
+            <div class="stat-number-card__icon">
+                <i class="bi bi-journal-text"></i>
+            </div>
+            <div class="stat-number-card__content">
+                <span class="stat-number-card__value">@Model.ReadingQuestionsCount</span>
+                <span class="stat-number-card__label">Reading Questions</span>
+            </div>
+            <span class="stat-number-card__meta">@Model.ReadingFormsCount form(s)</span>
+        </a>
+        <div class="stat-number-card stat-number-card--amber">
+            <div class="stat-number-card__icon">
+                <i class="bi bi-ui-checks-grid"></i>
+            </div>
+            <div class="stat-number-card__content">
+                <span class="stat-number-card__value">@(Model.ListeningFormsCount + Model.ReadingFormsCount)</span>
+                <span class="stat-number-card__label">Quiz Forms</span>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Quick-access stat cards -->
 <div class="dashboard-stats">
