@@ -7,5 +7,4 @@ node_modules/
 *.md
 .env
 .env.*
-wwwroot/css/site.css
 appsettings.Development.json
