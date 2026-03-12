@@ -4,7 +4,7 @@
     ViewData["Title"] = "Quiz Form " + ViewBag.FormNumber;
 }
 
-<div class="my-8 px-4">
+<div class="my-4 sm:my-8">
     <div class="quiz-card bg-white">
         <div class="quiz-card-header-primary">
             <h4 class="text-xl font-bold mb-1">Quiz: Form @ViewBag.FormNumber</h4>
@@ -12,7 +12,7 @@
         </div>
 
         <div class="p-6 bg-gray-50">
-            <div class="flex justify-between items-center mb-4">
+            <div class="quiz-stats-row flex justify-between items-center mb-4">
                 <div id="stats-summary" class="text-left font-semibold text-sm text-gray-700"></div>
                 <div class="gauge-container w-20 h-20">
                     <svg viewBox="0 0 100 100">

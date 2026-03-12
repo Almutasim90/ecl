@@ -20,7 +20,7 @@
 else
 {
     <p class="text-sm text-gray-400 mb-5">Choose a form to begin your listening practice session.</p>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div class="quiz-form-grid grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         @foreach (var num in Model)
         {
             <a asp-action="Quiz" asp-route-formNumber="@num" class="quiz-form-card no-underline">

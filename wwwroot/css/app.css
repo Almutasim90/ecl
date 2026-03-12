@@ -143,7 +143,35 @@ body.drawer-open .main-content { margin-left: var(--drawer-width); }
     inset: 0;
     background: rgba(0,0,0,0.45);
     z-index: 1040;
+    cursor: pointer;
   }
+
+  /* Tighter padding on mobile */
+  .page-body { padding: 1rem 0.875rem 1.5rem; }
+
+  /* Quiz card full width on mobile */
+  .quiz-card { border-radius: 12px; margin: 0; }
+
+  /* Stats + gauge row: stack vertically on very small screens */
+  .quiz-stats-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .quiz-stats-row .gauge-container { align-self: flex-end; }
+
+  /* Form cards: single column on small phones */
+  .quiz-form-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Reduce form card padding on mobile */
+  .quiz-form-card { padding: 1rem; gap: 8px; }
+  .quiz-form-card .form-number { width: 44px; height: 44px; border-radius: 10px; font-size: 1rem; }
+}
+
+@media (max-width: 400px) {
+  .quiz-form-grid { grid-template-columns: 1fr; }
+}
+
+/* Tablet: ensure quiz card fits within sidebar-open layout */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .quiz-card { max-width: 100%; }
+  .page-body { padding: 1.25rem 1.25rem 1.5rem; }
 }
 
 /* ── Top bar ────────────────────────────────────────────────────────────── */
