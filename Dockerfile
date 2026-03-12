@@ -1,33 +1,32 @@
-# ── Build stage ───────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# ── Stage 1: Build Frontend (Node.js) ──────────────────────────────
+FROM node:20-alpine AS node-build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build  # Assuming you have a build script in package.json
+
+# ── Stage 2: Build Backend (.NET) ──────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dotnet-build
 WORKDIR /src
-
-RUN apt-get update \
-	&& apt-get install -y --no-install-recommends nodejs npm \
-	&& rm -rf /var/lib/apt/lists/*
-
-COPY ECL.csproj ./
+COPY ["ECL.csproj", "./"]
 RUN dotnet restore
-
-COPY . ./
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+COPY . .
+# Copy frontend assets from the node-build stage
+COPY --from=node-build /app/wwwroot ./wwwroot
 RUN dotnet publish -c Release -o /app/publish
 
-# ── Runtime stage ─────────────────────────────────────────────────────────
+# ── Stage 3: Runtime ───────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
+COPY --from=dotnet-build /app/publish .
 
-# Audio files are mounted at runtime via Docker volume — not baked into image
-COPY --from=build /app/publish ./
-
-# Persist SQLite DB with server files in container storage/volume
+# Persist DB and Data
 RUN mkdir -p /app/App_Data
 VOLUME ["/app/App_Data"]
 
-# Prefer local SQLite file unless DATABASE_URL is explicitly provided at runtime
+# Connection via Environment Variable
 ENV ConnectionStrings__DefaultConnection="Data Source=/app/App_Data/ecl.db"
-
-# ASP.NET Core listens on port 8080 inside the container
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
