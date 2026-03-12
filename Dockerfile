@@ -1,35 +1,42 @@
-# ── Stage 1: Build Frontend (Node.js) ──────────────────────────────
-FROM node:20-alpine AS node-build
-WORKDIR /app
-COPY package*.json ./
-# Robust: Uses 'npm ci' if lock file exists, 'npm install' if it doesn't
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
-COPY . .
-RUN npm run build
-
-# ── Stage 2: Build Backend (.NET) ──────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dotnet-build
+# ── Stage 1: Build (.NET + Node for Tailwind CSS) ─────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["ECL.csproj", "./"]
+
+# Install Node.js (required for tailwindcss css:build during dotnet publish)
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Restore .NET dependencies first (layer cache)
+COPY ECL.csproj ./
 RUN dotnet restore
-COPY . .
-# Copy the compiled frontend assets from the node-build stage
-# Adjust '/app/dist' or '/app/wwwroot' to match your frontend build output
-COPY --from=node-build /app/wwwroot ./wwwroot
+
+# Install npm dependencies (for Tailwind)
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev
+
+# Copy remaining source and publish (triggers BuildTailwind target)
+COPY . ./
 RUN dotnet publish -c Release -o /app/publish
 
-# ── Stage 3: Runtime ───────────────────────────────────────────────
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
-COPY --from=dotnet-build /app/publish .
 
-# Persist DB and Data
-RUN mkdir -p /app/App_Data
-VOLUME ["/app/App_Data"]
+COPY --from=build /app/publish ./
 
-# Default settings
-ENV ConnectionStrings__DefaultConnection="Data Source=/app/App_Data/ecl.db"
+# Run as non-root user
+RUN adduser --disabled-password --no-create-home appuser \
+    && chown -R appuser /app
+USER appuser
+
+# ASP.NET Core listens on port 8080 inside the container
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
+
+# Connection string is supplied at runtime via environment variable:
+#   -e ConnectionStrings__DefaultConnection="Host=...;Database=...;Username=...;Password=..."
+# or via Docker secrets / compose env_file. Do NOT hardcode credentials here.
 
 ENTRYPOINT ["dotnet", "ECL.dll"]
