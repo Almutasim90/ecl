@@ -23,25 +23,14 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-// In production: DATABASE_URL env var (PostgreSQL Npgsql connection string).
-// In development: fall back to SQLite for local work.
-var envDbUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-var connectionString =
-    !string.IsNullOrWhiteSpace(envDbUrl) ? envDbUrl
-    : builder.Configuration.GetConnectionString("DefaultConnection")
-      ?? "Data Source=App_Data/ecl.db";
-
+// Production: always PostgreSQL. Development: SQLite fallback.
 var appDataDirectory = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
 Directory.CreateDirectory(appDataDirectory);
 
-static bool IsPostgres(string cs) =>
-    cs.StartsWith("Host=", StringComparison.OrdinalIgnoreCase) ||
-    cs.StartsWith("Server=", StringComparison.OrdinalIgnoreCase) ||
-    cs.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
-    cs.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) ||
-    cs.Contains("postgresql", StringComparison.OrdinalIgnoreCase);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Data Source=App_Data/ecl.db";
 
-if (IsPostgres(connectionString))
+if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddDbContext<ApplicationDbContext>(o => o
         .UseNpgsql(connectionString)
