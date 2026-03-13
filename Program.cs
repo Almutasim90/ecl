@@ -18,6 +18,7 @@ var webOrigin = Environment.GetEnvironmentVariable("WEB_ORIGIN") ?? "http://loca
 builder.Services.AddCors(options =>
     options.AddPolicy("AppPolicy", p => p
         .WithOrigins(webOrigin, "http://localhost:5000", "http://localhost:5173")
+        .SetIsOriginAllowed(origin => origin.StartsWith("http://localhost:"))
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()));

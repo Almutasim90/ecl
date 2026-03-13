@@ -3,10 +3,10 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Install Node.js for Tailwind CSS compilation
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
-    && rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && apt-get install -y --no-install-recommends curl \
+#    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+#  && apt-get install -y --no-install-recommends nodejs \
+#    && rm -rf /var/lib/apt/lists/*
 
 # Restore .NET deps
 COPY ECL.csproj ./
