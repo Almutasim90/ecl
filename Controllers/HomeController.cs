@@ -19,18 +19,19 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var listeningCount = await _context.ListeningQuestions.CountAsync();
-        var readingCount = await _context.ReadingQuestions.CountAsync();
-        var listeningForms = await _context.ListeningQuestions.Select(q => q.FormNumber).Distinct().CountAsync();
-        var readingForms = await _context.ReadingQuestions.Select(q => q.FormNumber).Distinct().CountAsync();
-
-        var model = new DashboardViewModel
+        var model = new DashboardViewModel();
+        try
         {
-            ListeningQuestionsCount = listeningCount,
-            ReadingQuestionsCount = readingCount,
-            ListeningFormsCount = listeningForms,
-            ReadingFormsCount = readingForms
-        };
+            model.ListeningQuestionsCount = await _context.ListeningQuestions.CountAsync();
+            model.ReadingQuestionsCount = await _context.ReadingQuestions.CountAsync();
+            model.ListeningFormsCount = await _context.ListeningQuestions.Select(q => q.FormNumber).Distinct().CountAsync();
+            model.ReadingFormsCount = await _context.ReadingQuestions.Select(q => q.FormNumber).Distinct().CountAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Dashboard could not load stats from database; showing zeros.");
+            ViewData["DashboardWarning"] = "Statistics temporarily unavailable. Check database connection.";
+        }
         return View(model);
     }
 

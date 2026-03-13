@@ -2,6 +2,12 @@
 @{
     ViewData["Title"] = "Dashboard";
 }
+@if (ViewData["DashboardWarning"] is string msg)
+{
+    <div class="alert-warning" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @msg
+    </div>
+}
 
 <!-- Statistics cards -->
 <section class="dashboard-stats-section" aria-label="Overview statistics">
