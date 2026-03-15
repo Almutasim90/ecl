@@ -22,6 +22,7 @@ namespace ECL.Controllers
         // GET api/listening?page=1&pageSize=20&search=&orderBy=qno&desc=false
         // ---------------------------------------------------------------
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(
             int page = 1,
             int pageSize = 20,
@@ -81,6 +82,7 @@ namespace ECL.Controllers
         // GET api/listening/forms  – distinct form numbers
         // ---------------------------------------------------------------
         [HttpGet("forms")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetForms()
         {
             var forms = await _context.ListeningQuestions
@@ -97,6 +99,7 @@ namespace ECL.Controllers
         // GET api/listening/quiz/{formNumber}
         // ---------------------------------------------------------------
         [HttpGet("quiz/{formNumber:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetQuiz(int formNumber)
         {
             var questions = await _context.ListeningQuestions
@@ -127,6 +130,7 @@ namespace ECL.Controllers
         // GET api/listening/{id}
         // ---------------------------------------------------------------
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var q = await _context.ListeningQuestions

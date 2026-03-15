@@ -22,6 +22,7 @@ namespace ECL.Controllers
         // GET api/reading?page=1&pageSize=20&search=&orderBy=qno&desc=false
         // ---------------------------------------------------------------
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(
             int page = 1,
             int pageSize = 20,
@@ -80,6 +81,7 @@ namespace ECL.Controllers
         // GET api/reading/forms  – distinct form numbers
         // ---------------------------------------------------------------
         [HttpGet("forms")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetForms()
         {
             var forms = await _context.ReadingQuestions
@@ -96,6 +98,7 @@ namespace ECL.Controllers
         // GET api/reading/quiz/{formNumber}
         // ---------------------------------------------------------------
         [HttpGet("quiz/{formNumber:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetQuiz(int formNumber)
         {
             var questions = await _context.ReadingQuestions
@@ -125,6 +128,7 @@ namespace ECL.Controllers
         // GET api/reading/{id}
         // ---------------------------------------------------------------
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var q = await _context.ReadingQuestions
