@@ -13,20 +13,20 @@ namespace ECL.Models
         [Display(Name = "Form Number")]
         public int FormNumber { get; set; }
 
-        [Display(Name = "Question Text")]
-        public string? AudioFile { get; set; }
+        [Display(Name = "Audio File")]
+        public string AudioFile { get; set; } = string.Empty;
         [Display(Name = " Option A")]
-        public string? OptionA { get; set; }
+        public string OptionA { get; set; } = string.Empty;
         [Display(Name = " Option B")]
-        public string? OptionB { get; set; }
+        public string OptionB { get; set; } = string.Empty;
         [Display(Name = " Option C")]
-        public string? OptionC { get; set; }
+        public string OptionC { get; set; } = string.Empty;
         [Display(Name = " Option D")]
-        public string? OptionD { get; set; }
+        public string OptionD { get; set; } = string.Empty;
         [Display(Name = "Correct Option")]
         public int CorrectOption { get; set; }
 
         [NotMapped]
-        public string? AudioPath => $"/AUDIO/{AudioFile}";
+        public string AudioPath => $"https://supabase.almutasim.site/storage/v1/object/public/AUDIO/{AudioFile}";
     }
 }

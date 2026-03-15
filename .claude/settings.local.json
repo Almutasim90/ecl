@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree -L 3 /c/Users/almaz/source/repos/ECL/ecl_mobile -I '.dart_tool|build|.idea' 2>/dev/null || find /c/Users/almaz/source/repos/ECL/ecl_mobile -maxdepth 3 -type d -not -path '*/\\\\.dart_tool*' -not -path '*/build*' -not -path '*/.idea*' | sort)"
+    ]
+  }
+}
