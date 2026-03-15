@@ -24,9 +24,11 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-// Always PostgreSQL (Supabase) — both development and production.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("DefaultConnection is not configured.");
+// Dev: SSH tunnel to localhost. Prod: DATABASE_URL set by Coolify.
+var connectionString = builder.Environment.IsDevelopment()
+    ? "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=Almutasim1990;SSL Mode=Prefer;"
+    : Environment.GetEnvironmentVariable("DATABASE_URL")
+        ?? throw new InvalidOperationException("DATABASE_URL not set in production.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o
     .UseNpgsql(connectionString)
