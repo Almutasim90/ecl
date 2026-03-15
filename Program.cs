@@ -78,7 +78,12 @@ builder.Services.AddRateLimiter(o =>
 
 var app = builder.Build();
 
-// Tables managed in Supabase — no automatic migrations.
+// Apply any pending EF migrations on startup.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
 
 // ── HTTP pipeline ─────────────────────────────────────────────────────────
 if (app.Environment.IsDevelopment())
