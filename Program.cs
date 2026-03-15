@@ -24,11 +24,20 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-// Dev: SSH tunnel to localhost. Prod: DATABASE_URL set by Coolify.
-var connectionString = builder.Environment.IsDevelopment()
-    ? "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=Almutasim1990;SSL Mode=Prefer;"
-    : Environment.GetEnvironmentVariable("DATABASE_URL")
+// Dev: SSH tunnel to localhost. Prod: DATABASE_URL (postgres:// URI) set by Coolify.
+string connectionString;
+if (builder.Environment.IsDevelopment())
+{
+    connectionString = "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=Almutasim1990;SSL Mode=Prefer;";
+}
+else
+{
+    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")
         ?? throw new InvalidOperationException("DATABASE_URL not set in production.");
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':', 2);
+    connectionString = $"Host={uri.Host};Port={(uri.Port > 0 ? uri.Port : 5432)};Database={uri.AbsolutePath.TrimStart('/')};Username={Uri.UnescapeDataString(userInfo[0])};Password={Uri.UnescapeDataString(userInfo.Length > 1 ? userInfo[1] : "")};SSL Mode=Disable;";
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o
     .UseNpgsql(connectionString)
