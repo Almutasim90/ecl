@@ -23,4 +23,4 @@ networks:
     external: true
   supabase_network:
     external: true
-    name: kw00scwwgsgc8gs48kccck04
+    name: msnhqastnwdl9epbmggflxxz
