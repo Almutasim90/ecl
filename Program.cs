@@ -23,21 +23,11 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-// Prefer DATABASE_URL from environment (e.g. .env, Docker); else use config.
-var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL")?.Trim();
-var connectionString = (!string.IsNullOrWhiteSpace(dbUrl)
-    ? dbUrl
-    : builder.Configuration.GetConnectionString("DefaultConnection"))?.Trim();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")?.Trim();
 
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(
-        "Database connection is not configured. Set DATABASE_URL or ConnectionStrings:DefaultConnection.");
-
-// Require minimal Npgsql connection string format (Host and Database).
-if (!connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
-    || !connectionString.Contains("Database=", StringComparison.OrdinalIgnoreCase))
-    throw new InvalidOperationException(
-        "Invalid connection string: must be Npgsql format with Host= and Database= (e.g. Host=host;Port=5432;Database=postgres;Username=user;Password=secret).");
+        "Database connection is not configured. Set ConnectionStrings:DefaultConnection in appsettings.json.");
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o
