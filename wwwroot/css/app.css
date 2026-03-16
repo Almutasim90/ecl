@@ -369,8 +369,8 @@ a { text-decoration: none; color: inherit; }
   font-size: .88rem;
 }
 
-/* Page content */
-.page-content { flex: 1; padding: 28px; max-width: 1440px; width: 100%; }
+/* Page content — min-width: 0 so flex child can shrink on small viewports */
+.page-content { flex: 1; padding: 28px; max-width: 1440px; width: 100%; min-width: 0; }
 .page-footer {
   padding: 14px 28px; border-top: 1px solid var(--card-border);
   font-size: .72rem; color: var(--t3); text-align: center;
@@ -383,9 +383,9 @@ a { text-decoration: none; color: inherit; }
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
 }
-.section-header-text {}
-.section-title    { font-size: 1.15rem; font-weight: 700; color: var(--t1); margin: 0; }
-.section-subtitle { font-size: .78rem; color: var(--t3); margin-top: 4px; }
+.section-header-text { min-width: 0; }
+.section-title    { font-size: 1.15rem; font-weight: 700; color: var(--t1); margin: 0; word-wrap: break-word; overflow-wrap: break-word; }
+.section-subtitle { font-size: .78rem; color: var(--t3); margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; }
 
 /* =============================================================================
    BUTTONS
@@ -561,11 +561,12 @@ a { text-decoration: none; color: inherit; }
 }
 .info-card-body { font-size: .83rem; color: var(--t2); line-height: 1.6; flex: 1; }
 
-/* Table card */
+/* Table card — allow horizontal scroll for wide DataTables on small viewports */
 .table-card {
   background: var(--card-bg); border: 1px solid var(--card-border);
-  border-radius: var(--card-radius); overflow: hidden;
+  border-radius: var(--card-radius); overflow-x: auto; overflow-y: visible;
   box-shadow: var(--card-shadow);
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Form card (create/edit/delete/details) */
@@ -702,7 +703,7 @@ table.dataTable tbody tr:last-child td { border-bottom: none !important; }
 .dataTables_wrapper .dataTables_filter,
 .dataTables_wrapper .dataTables_length { padding: 14px 16px 0; }
 .dataTables_wrapper .dataTables_info,
-.dataTables_wrapper .dataTables_paginate { padding: 10px 16px; }
+.dataTables_wrapper .dataTables_paginate { padding: 10px 16px; float: none; }
 
 .dataTables_filter label { display: flex; align-items: center; gap: 7px; font-size: .8rem; color: var(--t2); }
 .dataTables_filter input {
@@ -715,12 +716,20 @@ table.dataTable tbody tr:last-child td { border-bottom: none !important; }
   border-color: var(--violet-500); background: #fff;
   box-shadow: 0 0 0 3px rgba(139,92,246,.1);
 }
-.dataTables_info { font-size: .76rem; color: var(--t3); }
+.dataTables_info { font-size: .76rem; color: var(--t3); text-align: center; width: 100%; }
 
+/* Pagination: flex + wrap, centered */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
 .dataTables_wrapper .dataTables_paginate .paginate_button {
   border-radius: 7px !important; border: none !important;
   padding: 5px 9px !important; font-size: .78rem !important;
-  color: var(--t2) !important; margin: 0 1px;
+  color: var(--t2) !important; margin: 0;
   transition: all var(--speed);
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current,
@@ -1046,6 +1055,15 @@ table.dataTable td audio { vertical-align: middle; border-radius: 6px; }
   .quiz-card {
     max-width: 760px;
   }
+
+  /* DataTables — allow pagination to wrap on tablet */
+  .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .dataTables_wrapper .dataTables_paginate {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
 }
 
 @media (max-width: 767.98px) {
@@ -1058,6 +1076,9 @@ table.dataTable td audio { vertical-align: middle; border-radius: 6px; }
   .topbar { padding-left: 54px; padding-right: 14px; justify-content: flex-end; }
   .topbar-right { margin-left: 0; order: 1; }
   .topbar-left { left: 50%; transform: translateX(-50%); width: 60%; pointer-events: none; }
+  /* Hide page title and ECL Admin badge on mobile to keep header responsive */
+  .topbar-page-title { display: none; }
+  .topbar-badge { display: none; }
 
   .section-header { flex-direction: column; align-items: flex-start; margin-bottom: 14px; }
   .section-header .btn { width: 100%; justify-content: center; }
@@ -1108,11 +1129,40 @@ table.dataTable td audio { vertical-align: middle; border-radius: 6px; }
   .form-grid { grid-template-columns: repeat(3, 1fr); gap: 9px; }
   .form-num { width: 40px; height: 40px; font-size: .95rem; border-radius: 10px; }
 
-  /* DataTables */
+  /* DataTables — responsive table and pagination */
+  .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .dataTables_wrapper { min-width: 0; }
   .dataTables_wrapper .dataTables_length,
   .dataTables_wrapper .dataTables_filter { width: 100%; padding: 10px 12px 0; }
   .dataTables_filter label { flex-wrap: wrap; }
   .dataTables_filter input { width: 100%; }
+  /* Stack info above pagination; let pagination wrap (clear DataTables floats) */
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_paginate { float: none !important; }
+  .dataTables_wrapper .dataTables_info {
+    width: 100%;
+    margin-bottom: 8px;
+    font-size: .7rem;
+    text-align: center;
+  }
+  .dataTables_wrapper .dataTables_paginate {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px 12px !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 4px 7px !important;
+    font-size: .7rem !important;
+    margin: 0 !important;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+  .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    padding: 4px 8px !important;
+  }
 
   /* Stat cards */
   .stat-card { padding: 14px 16px; gap: 11px; }
@@ -1125,4 +1175,11 @@ table.dataTable td audio { vertical-align: middle; border-radius: 6px; }
   .form-grid { grid-template-columns: repeat(2, 1fr); }
   .quiz-nav-row { flex-direction: column; }
   .quiz-nav-btn { flex: none; }
+
+  /* DataTables — extra compact pagination on very small screens */
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 3px 5px !important;
+    font-size: .65rem !important;
+  }
+  .dataTables_wrapper .dataTables_info { font-size: .65rem; }
 }

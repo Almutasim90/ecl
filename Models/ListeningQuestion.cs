@@ -27,6 +27,6 @@ namespace ECL.Models
         public int CorrectOption { get; set; }
 
         [NotMapped]
-        public string AudioPath => $"https://supabase.almutasim.site/storage/v1/object/public/AUDIO/{AudioFile}";
+        public string AudioPath => $"https://ffgtgjonipvrhejwvldw.supabase.co/storage/v1/object/public/AUDIO/{AudioFile}";
     }
 }

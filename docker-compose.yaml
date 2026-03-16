@@ -8,18 +8,12 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8081
       - ASPNETCORE_ENVIRONMENT=Production
-      # PostgreSQL. For this Supabase stack use DATABASE_HOST_OVERRIDE=supabase-db-msnhqastnwdl9epbmggflxxz. ECL app must be on network msnhqastnwdl9epbmggflxxz. See CONNECTION_TROUBLESHOOTING.md.
       - DATABASE_URL=${DATABASE_URL}
-      - DATABASE_HOST_OVERRIDE=${DATABASE_HOST_OVERRIDE:-}
       # Public URL of the web app for CORS
-      - WEB_ORIGIN=${WEB_ORIGIN:-https://ecl.yourdomain.com}
+      - WEB_ORIGIN=${WEB_ORIGIN:-https://ecl.almutasim.site}
     networks:
       - coolify
-      - supabase_network
 
 networks:
   coolify:
     external: true
-  supabase_network:
-    external: true
-    name: msnhqastnwdl9epbmggflxxz

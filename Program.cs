@@ -3,7 +3,6 @@ using ECL.Data;
 using ECL.Filters;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,24 +36,6 @@ if (!connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
     throw new InvalidOperationException(
         "Invalid connection string: must be Npgsql format with Host= and Database= (e.g. Host=host;Port=5432;Database=postgres;Username=user;Password=secret).");
 
-// Optional: override Host via env (e.g. DATABASE_HOST_OVERRIDE=supabase-db-msnhqastnwdl9epbmggflxxz).
-var hostOverride = Environment.GetEnvironmentVariable("DATABASE_HOST_OVERRIDE")?.Trim();
-if (!string.IsNullOrEmpty(hostOverride))
-{
-    var csb = new NpgsqlConnectionStringBuilder(connectionString);
-    csb.Host = hostOverride;
-    connectionString = csb.ToString();
-}
-else
-{
-    // Coolify/Supabase: short name "supabase-db" does not resolve; use full container name on the Supabase network.
-    var csb = new NpgsqlConnectionStringBuilder(connectionString);
-    if (string.Equals(csb.Host, "supabase-db", StringComparison.OrdinalIgnoreCase))
-    {
-        csb.Host = "supabase-db-msnhqastnwdl9epbmggflxxz";
-        connectionString = csb.ToString();
-    }
-}
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o
     .UseNpgsql(connectionString)
