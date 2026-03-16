@@ -22,7 +22,7 @@ RUN dotnet restore
 
 # Copy rest of source and publish
 COPY . ./
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish ECL.csproj -c Release -o /app/publish
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
