@@ -8,7 +8,6 @@ services:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:8081
       - ASPNETCORE_ENVIRONMENT=Production
-      - DATABASE_URL=${DATABASE_URL}
       # Public URL of the web app for CORS
       - WEB_ORIGIN=${WEB_ORIGIN:-https://ecl.almutasim.site}
     networks:

@@ -23,8 +23,10 @@ builder.Services.AddCors(options =>
 
 // ── Database ──────────────────────────────────────────────────────────────
 // Prefer DATABASE_URL from environment (e.g. .env, Docker); else use config.
-var connectionString = (Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection"))?.Trim();
+var dbUrl = Environment.GetEnvironmentVariable("DATABASE_URL")?.Trim();
+var connectionString = (!string.IsNullOrWhiteSpace(dbUrl)
+    ? dbUrl
+    : builder.Configuration.GetConnectionString("DefaultConnection"))?.Trim();
 
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(
