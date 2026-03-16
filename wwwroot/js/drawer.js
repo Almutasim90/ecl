@@ -102,8 +102,32 @@ function body_classList_remove_drawer_open() {
   }
 }
 
+// ── Desktop sidebar collapse ───────────────────────────────────────────────
+const COLLAPSE_KEY = 'ecl.sidebar.collapsed';
+
+function initDesktopCollapse() {
+  const btn = document.getElementById('sidebar-desktop-toggle');
+  if (!btn) return;
+
+  // Restore saved state
+  let collapsed = false;
+  try { collapsed = localStorage.getItem(COLLAPSE_KEY) === '1'; } catch (e) { /* ignore */ }
+  if (collapsed) document.body.classList.add('sidebar-collapsed');
+
+  btn.addEventListener('click', () => {
+    const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+    try { localStorage.setItem(COLLAPSE_KEY, isCollapsed ? '1' : '0'); } catch (e) { /* ignore */ }
+  });
+
+  // Clear collapsed state when resizing to mobile (overlay mode takes over)
+  window.addEventListener('resize', () => {
+    if (!isDesktop()) document.body.classList.remove('sidebar-collapsed');
+  });
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDrawer);
+  document.addEventListener('DOMContentLoaded', () => { initDrawer(); initDesktopCollapse(); });
 } else {
   initDrawer();
+  initDesktopCollapse();
 }
