@@ -40,6 +40,13 @@ public class HomeController : Controller
         return View();
     }
 
+    /// <summary>Shown when the database connection is unavailable (e.g. after a DB exception or linked from dashboard warning).</summary>
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult DatabaseUnavailable()
+    {
+        return View("DatabaseUnavailable");
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

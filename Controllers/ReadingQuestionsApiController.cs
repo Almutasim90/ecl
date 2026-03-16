@@ -1,6 +1,5 @@
 using ECL.Data;
 using ECL.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +7,7 @@ namespace ECL.Controllers
 {
     [ApiController]
     [Route("api/reading")]
-    [Authorize]
+  
     public class ReadingQuestionsApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +21,6 @@ namespace ECL.Controllers
         // GET api/reading?page=1&pageSize=20&search=&orderBy=qno&desc=false
         // ---------------------------------------------------------------
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAll(
             int page = 1,
             int pageSize = 20,
@@ -81,7 +79,6 @@ namespace ECL.Controllers
         // GET api/reading/forms  – distinct form numbers
         // ---------------------------------------------------------------
         [HttpGet("forms")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetForms()
         {
             var forms = await _context.ReadingQuestions
@@ -98,7 +95,6 @@ namespace ECL.Controllers
         // GET api/reading/quiz/{formNumber}
         // ---------------------------------------------------------------
         [HttpGet("quiz/{formNumber:int}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetQuiz(int formNumber)
         {
             var questions = await _context.ReadingQuestions
@@ -128,7 +124,6 @@ namespace ECL.Controllers
         // GET api/reading/{id}
         // ---------------------------------------------------------------
         [HttpGet("{id:int}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var q = await _context.ReadingQuestions
@@ -142,7 +137,6 @@ namespace ECL.Controllers
         // POST api/reading
         // ---------------------------------------------------------------
         [HttpPost]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create([FromBody] ReadingQuestion question)
         {
             if (!ModelState.IsValid)
@@ -158,7 +152,6 @@ namespace ECL.Controllers
         // PUT api/reading/{id}
         // ---------------------------------------------------------------
         [HttpPut("{id:int}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Update(int id, [FromBody] ReadingQuestion question)
         {
             if (id != question.Qno)
@@ -187,7 +180,6 @@ namespace ECL.Controllers
         // DELETE api/reading/{id}
         // ---------------------------------------------------------------
         [HttpDelete("{id:int}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Delete(int id)
         {
             var question = await _context.ReadingQuestions.FindAsync(id);

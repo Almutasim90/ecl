@@ -1,6 +1,5 @@
 using ECL.Data;
 using ECL.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +7,6 @@ namespace ECL.Controllers
 {
     [ApiController]
     [Route("api/listening")]
-    [Authorize]
     public class ListeningQuestionsApiController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +20,6 @@ namespace ECL.Controllers
         // GET api/listening?page=1&pageSize=20&search=&orderBy=qno&desc=false
         // ---------------------------------------------------------------
         [HttpGet]
-        [AllowAnonymous]
         public async Task<IActionResult> GetAll(
             int page = 1,
             int pageSize = 20,
@@ -82,7 +79,6 @@ namespace ECL.Controllers
         // GET api/listening/forms  – distinct form numbers
         // ---------------------------------------------------------------
         [HttpGet("forms")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetForms()
         {
             var forms = await _context.ListeningQuestions
@@ -99,7 +95,6 @@ namespace ECL.Controllers
         // GET api/listening/quiz/{formNumber}
         // ---------------------------------------------------------------
         [HttpGet("quiz/{formNumber:int}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetQuiz(int formNumber)
         {
             var questions = await _context.ListeningQuestions
@@ -130,7 +125,6 @@ namespace ECL.Controllers
         // GET api/listening/{id}
         // ---------------------------------------------------------------
         [HttpGet("{id:int}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var q = await _context.ListeningQuestions
@@ -144,7 +138,6 @@ namespace ECL.Controllers
         // POST api/listening
         // ---------------------------------------------------------------
         [HttpPost]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Create([FromBody] ListeningQuestion question)
         {
             if (!ModelState.IsValid)
@@ -160,7 +153,6 @@ namespace ECL.Controllers
         // PUT api/listening/{id}
         // ---------------------------------------------------------------
         [HttpPut("{id:int}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Update(int id, [FromBody] ListeningQuestion question)
         {
             if (id != question.Qno)
@@ -189,7 +181,6 @@ namespace ECL.Controllers
         // DELETE api/listening/{id}
         // ---------------------------------------------------------------
         [HttpDelete("{id:int}")]
-        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Delete(int id)
         {
             var question = await _context.ListeningQuestions.FindAsync(id);

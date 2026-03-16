@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Database Unavailable";
+    Layout = "_Layout";
+}
+
+<div class="database-unavailable">
+    <div class="database-unavailable__card">
+        <div class="database-unavailable__icon" aria-hidden="true">
+            <i class="bi bi-database-x"></i>
+        </div>
+        <h1 class="database-unavailable__title">Database connection unavailable</h1>
+        <p class="database-unavailable__message">
+            We couldn't connect to the database right now. The site is running, but data cannot be loaded.
+        </p>
+        <p class="database-unavailable__hint">
+            Please try again in a few moments. If the problem continues, the administrator may need to check the database connection.
+        </p>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary database-unavailable__action">Back to home</a>
+    </div>
+</div>
+
+<style>
+    .database-unavailable {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+        padding: 1.5rem;
+    }
+    .database-unavailable__card {
+        max-width: 28rem;
+        text-align: center;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        background: var(--card-bg, #f8f9fa);
+        border: 1px solid var(--border-color, #dee2e6);
+    }
+    .database-unavailable__icon {
+        font-size: 3rem;
+        color: var(--bs-warning, #856404);
+        margin-bottom: 1rem;
+    }
+    .database-unavailable__title {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+    }
+    .database-unavailable__message {
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 0.5rem;
+    }
+    .database-unavailable__hint {
+        font-size: 0.875rem;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 1.5rem;
+    }
+    .database-unavailable__action {
+        margin-top: 0.5rem;
+    }
+</style>

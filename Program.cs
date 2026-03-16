@@ -1,15 +1,14 @@
-using System.Text;
 using System.Threading.RateLimiting;
 using ECL.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using ECL.Filters;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(o => o.Filters.Add<DatabaseExceptionFilter>());
 builder.Services.AddRazorPages();
 
 // ── CORS ──────────────────────────────────────────────────────────────────
@@ -24,42 +23,43 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("DefaultConnection is not configured.");
+// Prefer DATABASE_URL from environment (e.g. .env, Docker); else use config.
+var connectionString = (Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection"))?.Trim();
+
+if (string.IsNullOrWhiteSpace(connectionString))
+    throw new InvalidOperationException(
+        "Database connection is not configured. Set DATABASE_URL or ConnectionStrings:DefaultConnection.");
+
+// Require minimal Npgsql connection string format (Host and Database).
+if (!connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
+    || !connectionString.Contains("Database=", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException(
+        "Invalid connection string: must be Npgsql format with Host= and Database= (e.g. Host=host;Port=5432;Database=postgres;Username=user;Password=secret).");
+
+// Optional: override Host via env (e.g. DATABASE_HOST_OVERRIDE=supabase-db-msnhqastnwdl9epbmggflxxz).
+var hostOverride = Environment.GetEnvironmentVariable("DATABASE_HOST_OVERRIDE")?.Trim();
+if (!string.IsNullOrEmpty(hostOverride))
+{
+    var csb = new NpgsqlConnectionStringBuilder(connectionString);
+    csb.Host = hostOverride;
+    connectionString = csb.ToString();
+}
+else
+{
+    // Coolify/Supabase: short name "supabase-db" does not resolve; use full container name on the Supabase network.
+    var csb = new NpgsqlConnectionStringBuilder(connectionString);
+    if (string.Equals(csb.Host, "supabase-db", StringComparison.OrdinalIgnoreCase))
+    {
+        csb.Host = "supabase-db-msnhqastnwdl9epbmggflxxz";
+        connectionString = csb.ToString();
+    }
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o
     .UseNpgsql(connectionString)
     .ConfigureWarnings(w => w.Ignore(
         Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
-
-// ── JWT Auth (Supabase GoTrue) ────────────────────────────────────────────
-var jwtSecret = Environment.GetEnvironmentVariable("SUPABASE_JWT_SECRET");
-if (!string.IsNullOrWhiteSpace(jwtSecret))
-{
-    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromSeconds(30)
-            };
-        });
-
-    builder.Services.AddAuthorization(options =>
-        options.AddPolicy("AdminOnly", p => p.RequireClaim("role", "admin")));
-}
-else
-{
-    // Dev mode: no JWT required — allow everything through
-    builder.Services.AddAuthentication();
-    builder.Services.AddAuthorization(options =>
-        options.AddPolicy("AdminOnly", p => p.RequireAssertion(_ => true)));
-}
 
 // ── Rate Limiting ─────────────────────────────────────────────────────────
 builder.Services.AddRateLimiter(o =>
@@ -77,15 +77,21 @@ builder.Services.AddRateLimiter(o =>
 
 var app = builder.Build();
 
-// Apply any pending EF migrations on startup.
+// Try to connect and run migrations. If DB is unreachable, log and continue — app always starts so the site can display a "no connection" message.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    try { db.Database.Migrate(); }
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        if (await db.Database.CanConnectAsync())
+            await db.Database.MigrateAsync();
+        else
+            logger.LogWarning("Database unreachable at startup — app will run; pages will show a connection message.");
+    }
     catch (Exception ex)
     {
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Migration failed on startup — app will continue but DB may be out of date.");
+        logger.LogWarning(ex, "Database startup failed — app will run; pages will show a connection message when data is needed.");
     }
 }
 
@@ -101,8 +107,7 @@ else
 
 app.UseRouting();
 app.UseCors("AppPolicy");
-app.UseAuthentication();
-app.UseAuthorization();
+
 app.UseRateLimiter();
 
 app.MapStaticAssets();
