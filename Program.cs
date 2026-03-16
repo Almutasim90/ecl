@@ -12,7 +12,8 @@ builder.Services.AddRazorPages();
 
 // ── CORS ──────────────────────────────────────────────────────────────────
 // Web origin comes from env (production) or falls back to localhost for dev.
-var webOrigin = Environment.GetEnvironmentVariable("WEB_ORIGIN") ?? "http://localhost:5000";
+var webOrigin = Environment.GetEnvironmentVariable("WEB_ORIGIN")?.Trim();
+if (string.IsNullOrWhiteSpace(webOrigin)) webOrigin = "http://localhost:5000";
 builder.Services.AddCors(options =>
     options.AddPolicy("AppPolicy", p => p
         .WithOrigins(webOrigin, "http://localhost:5000", "http://localhost:5173")

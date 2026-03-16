@@ -9,7 +9,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8081
       - ASPNETCORE_ENVIRONMENT=Production
       # Public URL of the web app for CORS
-      - WEB_ORIGIN=${WEB_ORIGIN:-https://ecl.almutasim.site}
+      - WEB_ORIGIN=${WEB_ORIGIN:-http://ecl.almutasim.site}
     networks:
       - coolify
 
