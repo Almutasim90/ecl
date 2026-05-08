@@ -1,0 +1,61 @@
+@model ECL.Models.GrammarQuestion
+
+@{
+    ViewData["Title"] = "Delete Grammar Question";
+}
+
+<div class="form-card">
+    <div class="form-card-header">
+        <div class="form-card-icon red"><i class="bi bi-trash3"></i></div>
+        <div>
+            <div class="form-card-title">Delete Grammar Question <span class="text-red-500">#@Model.Qno</span></div>
+            <div class="form-card-subtitle text-red-400">This action cannot be undone.</div>
+        </div>
+    </div>
+
+    <div class="form-card-body">
+        <div class="alert-warning mb-4">
+            Are you sure you want to permanently delete this grammar question?
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-key">Type</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.GrammarType)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Question</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.QuestionText)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option A</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionA)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option B</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionB)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option C</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionC)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option D</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionD)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Correct Answer</span>
+            <span class="detail-val">Option @Model.CorrectOption</span>
+        </div>
+
+        <form asp-action="Delete" class="form-actions mt-5">
+            <input type="hidden" asp-for="Qno" />
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash3"></i> Yes, Delete
+            </button>
+            <a asp-action="Index" class="btn btn-ghost">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,207 @@
+@model List<ECL.Models.GrammarQuestion>
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Grammar Quiz · " + ViewBag.GrammarType;
+}
+
+<div class="quiz-page-wrap">
+    <div class="quiz-card">
+
+        <div class="quiz-card-header-primary">
+            <h4><i class="bi bi-spellcheck"></i> Grammar Quiz — @ViewBag.GrammarType</h4>
+            <div class="quiz-progress-pill">
+                <i class="bi bi-list-ol"></i>
+                <span id="progress-text">Question 1 of @Model.Count</span>
+            </div>
+        </div>
+
+        <div class="quiz-body">
+
+            <div class="quiz-stats-row">
+                <div class="quiz-stats-text" id="stats-summary"></div>
+                <div class="gauge-wrap">
+                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                        <circle class="gauge-bg" cx="50" cy="50" r="45" />
+                        <circle class="gauge-fg" cx="50" cy="50" r="45" />
+                        <text id="gauge-text" x="50" y="57" text-anchor="middle"
+                              font-size="18" font-weight="700" fill="#64748b"></text>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="question-text" class="quiz-q-text"></div>
+            <div id="optionsContainer" class="quiz-options-list"></div>
+
+            <button type="button" id="submitBtn" class="quiz-submit-btn violet" disabled>
+                Submit Answer
+            </button>
+
+            <div class="quiz-nav-row">
+                <button type="button" id="prevBtn" class="quiz-nav-btn" disabled>
+                    <i class="bi bi-chevron-left"></i> Previous
+                </button>
+                <button type="button" id="skipBtn" class="quiz-nav-btn">
+                    Skip <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+
+            <div id="feedback" class="quiz-feedback"></div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+const questions  = @Html.Raw(JsonSerializer.Serialize(Model));
+const total      = questions.length;
+const storageKey = 'grammarQuizState_' + @Html.Raw(JsonSerializer.Serialize((string)ViewBag.GrammarType));
+let   current    = 0;
+let   answers    = Array(total).fill(null);
+
+try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) {
+        const s = JSON.parse(raw);
+        if (typeof s.current === 'number' && Array.isArray(s.answers)) {
+            current = Math.min(s.current, total - 1);
+            answers = s.answers
+                .concat(Array(Math.max(0, total - s.answers.length)).fill(null))
+                .slice(0, total);
+        }
+    }
+} catch (_) {}
+
+const progressEl = document.getElementById('progress-text');
+const statsEl    = document.getElementById('stats-summary');
+const gaugeFg    = document.querySelector('.gauge-fg');
+const gaugeText  = document.getElementById('gauge-text');
+const qTextEl    = document.getElementById('question-text');
+const optsEl     = document.getElementById('optionsContainer');
+const submitBtn  = document.getElementById('submitBtn');
+const feedbackEl = document.getElementById('feedback');
+const prevBtn    = document.getElementById('prevBtn');
+const skipBtn    = document.getElementById('skipBtn');
+
+const CIRC = 2 * Math.PI * 45;
+
+function saveState() {
+    try { localStorage.setItem(storageKey, JSON.stringify({ current, answers })); } catch (_) {}
+}
+
+function updateGauge() {
+    const score = answers.reduce((n, a) => n + (a?.submitted && a?.correct ? 1 : 0), 0);
+    const asked = answers.reduce((n, a) => n + (a?.submitted ? 1 : 0), 0);
+    const pct   = total ? Math.round((score / total) * 100) : 0;
+    gaugeFg.style.strokeDashoffset = CIRC * (1 - score / total);
+    gaugeFg.style.stroke = pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#f43f5e';
+    gaugeText.textContent = pct + '%';
+    statsEl.innerHTML =
+        `Answered: <strong>${asked}/${total}</strong><br>` +
+        `<span class="quiz-score-ok">✓ ${score}</span> &nbsp;` +
+        `<span class="quiz-score-bad">✗ ${asked - score}</span>`;
+}
+
+function loadQuestion() {
+    feedbackEl.innerHTML  = '';
+    optsEl.innerHTML      = '';
+    submitBtn.textContent = 'Submit Answer';
+    submitBtn.disabled    = true;
+    submitBtn.onclick     = null;
+    updateGauge();
+
+    const q = questions[current];
+    progressEl.textContent = `Question ${current + 1} of ${total}`;
+    qTextEl.textContent    = q.QuestionText;
+    prevBtn.disabled       = current === 0;
+
+    const letters = ['A','B','C','D'];
+    ['OptionA','OptionB','OptionC','OptionD'].forEach((k, i) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'quiz-option';
+        btn.dataset.label = letters[i];
+        btn.dataset.value = i + 1;
+        btn.textContent   = q[k];
+        btn.addEventListener('click', () => selectOption(btn));
+        optsEl.appendChild(btn);
+    });
+
+    const ans = answers[current];
+    if (ans?.choice && !ans.submitted) {
+        const b = optsEl.children[ans.choice - 1];
+        if (b) { b.classList.add('active'); enableSubmit(); }
+    }
+    if (ans?.submitted) {
+        applyResult(ans);
+        submitBtn.textContent = current + 1 < total ? 'Next →' : 'Finish';
+        submitBtn.disabled    = false;
+        submitBtn.onclick     = nextHandler;
+    }
+    saveState();
+}
+
+function selectOption(btn) {
+    Array.from(optsEl.children).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (!answers[current]) answers[current] = { choice: null, submitted: false, correct: null };
+    answers[current].choice = parseInt(btn.dataset.value);
+    enableSubmit();
+    saveState();
+}
+
+function enableSubmit() {
+    submitBtn.disabled = false;
+    submitBtn.onclick  = submitHandler;
+}
+
+function submitHandler() {
+    const active = optsEl.querySelector('.active');
+    if (!active) return;
+    const choice  = parseInt(active.dataset.value);
+    const correct = questions[current].CorrectOption;
+    answers[current] = { choice, submitted: true, correct: choice === correct };
+    applyResult(answers[current]);
+    updateGauge();
+    saveState();
+    submitBtn.textContent = current + 1 < total ? 'Next →' : 'Finish';
+    submitBtn.disabled    = false;
+    submitBtn.onclick     = nextHandler;
+}
+
+function applyResult(ans) {
+    const sel = ans.choice ? optsEl.children[ans.choice - 1] : null;
+    const cor = optsEl.children[questions[current].CorrectOption - 1];
+    Array.from(optsEl.children).forEach(b => b.classList.remove('active'));
+    if (sel) sel.classList.add(ans.correct ? 'correct' : 'wrong');
+    if (!ans.correct && cor) cor.classList.add('correct');
+    feedbackEl.innerHTML = ans.correct
+        ? '<span class="quiz-score-ok">✓ Correct!</span>'
+        : `<span class="quiz-score-bad">✗ Wrong — Correct: <strong>${cor?.textContent ?? ''}</strong></span>`;
+}
+
+function nextHandler() {
+    current++;
+    if (current < total) {
+        loadQuestion();
+    } else {
+        const score = answers.reduce((n, a) => n + (a?.submitted && a?.correct ? 1 : 0), 0);
+        const pct   = Math.round((score / total) * 100);
+        if (confirm(`Quiz complete!\n\nScore: ${score} / ${total}  (${pct}%)\n\nReturn to quiz list?`)) {
+            window.location.href = '@Url.Action("StartQuiz")';
+        }
+    }
+}
+
+prevBtn.addEventListener('click', () => {
+    if (current > 0) { current--; saveState(); loadQuestion(); }
+});
+skipBtn.addEventListener('click', () => {
+    if (!answers[current]) answers[current] = { choice: null, submitted: false, correct: null };
+    if (current < total - 1) { current++; saveState(); loadQuestion(); }
+});
+
+loadQuestion();
+</script>
+}
+

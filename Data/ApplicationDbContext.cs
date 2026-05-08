@@ -11,6 +11,7 @@ namespace ECL.Data
 
         public DbSet<ListeningQuestion> ListeningQuestions { get; set; }
         public DbSet<ReadingQuestion> ReadingQuestions { get; set; }
+        public DbSet<GrammarQuestion> GrammarQuestions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +39,20 @@ namespace ECL.Data
                 e.HasKey(x => x.Qno);
                 e.Property(x => x.Qno).HasColumnName("qno");
                 e.Property(x => x.FormNumber).HasColumnName("formnumber");
+                e.Property(x => x.QuestionText).HasColumnName("questiontext");
+                e.Property(x => x.OptionA).HasColumnName("optiona");
+                e.Property(x => x.OptionB).HasColumnName("optionb");
+                e.Property(x => x.OptionC).HasColumnName("optionc");
+                e.Property(x => x.OptionD).HasColumnName("optiond");
+                e.Property(x => x.CorrectOption).HasColumnName("correctoption");
+            });
+
+            modelBuilder.Entity<GrammarQuestion>(e =>
+            {
+                e.ToTable("grammarquestions");
+                e.HasKey(x => x.Qno);
+                e.Property(x => x.Qno).HasColumnName("qno");
+                e.Property(x => x.GrammarType).HasColumnName("grammartype");
                 e.Property(x => x.QuestionText).HasColumnName("questiontext");
                 e.Property(x => x.OptionA).HasColumnName("optiona");
                 e.Property(x => x.OptionB).HasColumnName("optionb");

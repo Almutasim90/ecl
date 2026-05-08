@@ -1,0 +1,56 @@
+@model ECL.Models.GrammarQuestion
+
+@{
+    ViewData["Title"] = "Grammar Question Details";
+}
+
+<div class="form-card">
+    <div class="form-card-header">
+        <div class="form-card-icon purple"><i class="bi bi-journal-text"></i></div>
+        <div>
+            <div class="form-card-title">Grammar Question <span class="text-blue-500">#@Model.Qno</span></div>
+            <div class="form-card-subtitle">@Html.DisplayFor(m => m.GrammarType)</div>
+        </div>
+    </div>
+
+    <div class="form-card-body">
+        <div class="detail-row">
+            <span class="detail-key">Type</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.GrammarType)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Question</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.QuestionText)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option A</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionA)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option B</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionB)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option C</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionC)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Option D</span>
+            <span class="detail-val">@Html.DisplayFor(m => m.OptionD)</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Correct Answer</span>
+            <span class="detail-val">Option @Model.CorrectOption</span>
+        </div>
+
+        <div class="form-actions mt-5">
+            <a asp-action="Edit" asp-route-id="@Model?.Qno" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-ghost">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+

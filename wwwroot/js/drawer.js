@@ -12,7 +12,6 @@ function isDesktop() {
 function setDrawerOpen(open, { save = true } = {}) {
   const body     = document.body;
   const toggle   = document.getElementById('drawer-toggle');
-  const backdrop = document.getElementById('sidebar-backdrop');
 
   if (open) {
     body.classList.add('drawer-open');
@@ -54,6 +53,13 @@ function initDrawer() {
   if (backdrop) {
     backdrop.addEventListener('click', () => setDrawerOpen(false));
   }
+
+  // Close the drawer after navigation (mobile/tablet only)
+  sidebar.addEventListener('click', (e) => {
+    if (isDesktop()) return;
+    const target = e.target instanceof Element ? e.target.closest('a') : null;
+    if (target) setDrawerOpen(false);
+  });
 
   // Escape key closes drawer
   document.addEventListener('keydown', (e) => {

@@ -1,0 +1,86 @@
+@model ECL.Models.GrammarQuestion
+
+@{
+    ViewData["Title"] = "Edit Grammar Question";
+}
+
+<div class="form-card">
+    <div class="form-card-header">
+        <div class="form-card-icon purple"><i class="bi bi-pencil-square"></i></div>
+        <div>
+            <div class="form-card-title">Edit Grammar Question <span class="text-blue-500">#@Model.Qno</span></div>
+            <div class="form-card-subtitle">Update the fields below and save.</div>
+        </div>
+    </div>
+
+    <div class="form-card-body">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert-error"></div>
+            <input type="hidden" asp-for="Qno" />
+
+            <div class="field-group">
+                <label asp-for="GrammarType" class="field-label"></label>
+                <input asp-for="GrammarType" class="field-input" />
+                <span asp-validation-for="GrammarType" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="QuestionText" class="field-label"></label>
+                <textarea asp-for="QuestionText" class="field-input" rows="3"></textarea>
+                <span asp-validation-for="QuestionText" class="field-error"></span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                <div class="field-group">
+                    <label asp-for="OptionA" class="field-label">Option A</label>
+                    <input asp-for="OptionA" class="field-input" />
+                    <span asp-validation-for="OptionA" class="field-error"></span>
+                </div>
+                <div class="field-group">
+                    <label asp-for="OptionB" class="field-label">Option B</label>
+                    <input asp-for="OptionB" class="field-input" />
+                    <span asp-validation-for="OptionB" class="field-error"></span>
+                </div>
+                <div class="field-group">
+                    <label asp-for="OptionC" class="field-label">Option C</label>
+                    <input asp-for="OptionC" class="field-input" />
+                    <span asp-validation-for="OptionC" class="field-error"></span>
+                </div>
+                <div class="field-group">
+                    <label asp-for="OptionD" class="field-label">Option D</label>
+                    <input asp-for="OptionD" class="field-input" />
+                    <span asp-validation-for="OptionD" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Correct Answer</label>
+                <div class="correct-option-group">
+                    <input type="radio" asp-for="CorrectOption" value="1" id="co1" />
+                    <label for="co1">A</label>
+                    <input type="radio" asp-for="CorrectOption" value="2" id="co2" />
+                    <label for="co2">B</label>
+                    <input type="radio" asp-for="CorrectOption" value="3" id="co3" />
+                    <label for="co3">C</label>
+                    <input type="radio" asp-for="CorrectOption" value="4" id="co4" />
+                    <label for="co4">D</label>
+                </div>
+                <span asp-validation-for="CorrectOption" class="field-error"></span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-floppy"></i> Save Changes
+                </button>
+                <a asp-action="Index" class="btn btn-ghost">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

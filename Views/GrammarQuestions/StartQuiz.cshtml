@@ -1,0 +1,50 @@
+@model List<string>
+@{
+    ViewData["Title"] = "Grammar Quiz";
+}
+
+@if (TempData["DbError"] != null)
+{
+    <div class="alert-error">
+        <strong>Database Error:</strong> @TempData["DbError"]
+        <br /><small>Check that the database is connected and contains data.</small>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        No grammar types available. The database may be empty or unreachable.
+    </div>
+}
+else
+{
+    <p class="muted-note">
+        Choose a grammar topic to begin your practice session.
+    </p>
+    <div class="form-grid">
+        <a asp-action="RandomQuiz" asp-route-count="20" class="form-grid-card">
+            <div class="form-num" style="background: color-mix(in srgb, var(--blue-500) 14%, transparent); color: var(--blue-600);">
+                <i class="bi bi-shuffle"></i>
+            </div>
+            <div class="form-grid-card-label">Random Mix</div>
+            <div class="form-grid-card-cta">
+                <i class="bi bi-play-fill"></i> Start
+            </div>
+        </a>
+        @foreach (var t in Model)
+        {
+            <a asp-action="Quiz" asp-route-grammarType="@t" class="form-grid-card">
+                <div class="form-num" style="background: color-mix(in srgb, var(--violet-500) 14%, transparent); color: var(--violet-600);">
+                    <i class="bi bi-spellcheck"></i>
+                </div>
+                <div class="form-grid-card-label">@t</div>
+                <div class="form-grid-card-cta">
+                    <i class="bi bi-play-fill"></i> Start
+                </div>
+            </a>
+        }
+    </div>
+}
+

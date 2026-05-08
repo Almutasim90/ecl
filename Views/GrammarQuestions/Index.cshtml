@@ -1,0 +1,96 @@
+@{
+    ViewData["Title"] = "Grammar Questions";
+}
+
+<div class="section-header">
+    <div class="section-header-text">
+        <h1 class="section-title">Grammar Questions</h1>
+        <p class="section-subtitle">Browse and manage all English grammar questions.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Create New
+    </a>
+</div>
+
+<div class="table-card">
+    <table id="GrammarTable" class="display hover stripe w-full">
+        <thead>
+            <tr>
+                <th>Q#</th>
+                <th>Type</th>
+                <th>Question</th>
+                <th>Option A</th>
+                <th>Option B</th>
+                <th>Option C</th>
+                <th>Option D</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+    $(function () {
+        $('#GrammarTable').DataTable({
+            serverSide:  true,
+            processing:  true,
+            responsive:  true,
+            pageLength:  10,
+            ajax: {
+                url:  '@Url.Action("LoadData", "GrammarQuestions")',
+                type: 'GET',
+                data: function (d) {
+                    return {
+                        draw:        d.draw,
+                        start:       d.start,
+                        length:      d.length,
+                        search:      d.search.value,
+                        orderColumn: d.columns[d.order[0].column].data,
+                        orderDir:    d.order[0].dir
+                    };
+                },
+                error: function (xhr, error, thrown) {
+                    console.error('DataTable AJAX error', xhr.status, thrown);
+                }
+            },
+            columns: [
+                { data: 'qno',         title: 'Q#',       width: '55px'  },
+                { data: 'grammarType', title: 'Type',     width: '160px' },
+                { data: 'questionText',title: 'Question'                 },
+                { data: 'optionA',     title: 'Option A'                 },
+                { data: 'optionB',     title: 'Option B'                 },
+                { data: 'optionC',     title: 'Option C'                 },
+                { data: 'optionD',     title: 'Option D'                 },
+                {
+                    data:       'qno',
+                    title:      'Actions',
+                    orderable:  false,
+                    searchable: false,
+                    width:      '100px',
+                    render: function (id) {
+                        return '<div style="display:flex;gap:5px">' +
+                               '<a class="dt-btn dt-btn-view" href="/GrammarQuestions/Details/' + id + '" title="View"><span class="material-icons" style="font-size:15px">visibility</span></a>' +
+                               '<a class="dt-btn dt-btn-edit"  href="/GrammarQuestions/Edit/'    + id + '" title="Edit"><span class="material-icons" style="font-size:15px">edit</span></a>' +
+                               '<a class="dt-btn dt-btn-delete" href="/GrammarQuestions/Delete/' + id + '" title="Delete"><span class="material-icons" style="font-size:15px">delete</span></a>' +
+                               '</div>';
+                    }
+                }
+            ],
+            order:      [[0, 'asc']],
+            lengthMenu: [[10, 25, 50, 100, -1], ['10', '25', '50', '100', 'All']],
+            language: {
+                processing: '<span class="material-icons spin">autorenew</span> Loading…',
+                paginate: {
+                    previous: '<span class="material-icons">chevron_left</span>',
+                    next:     '<span class="material-icons">chevron_right</span>'
+                },
+                info:    'Showing _START_–_END_ of _TOTAL_ questions',
+                search:  '<span class="material-icons align-middle" style="font-size:18px">search</span>'
+            }
+        });
+    });
+    </script>
+}
+
