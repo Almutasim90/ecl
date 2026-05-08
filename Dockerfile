@@ -29,9 +29,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish ./
-
-ENV ASPNETCORE_URLS=http://+:8081
+# Configure both HTTP (8081) and HTTPS (8082)
+ENV ASPNETCORE_URLS=http://+:8081;https://+:8082
 ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Expose both ports
 EXPOSE 8081
+EXPOSE 8082
 
 ENTRYPOINT ["dotnet", "ECL.dll"]
