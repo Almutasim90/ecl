@@ -23,7 +23,16 @@ else
     <p class="muted-note">
         Choose a form to begin your reading practice session.
     </p>
-    <div class="form-grid">
+
+    <div class="reading-toolbar">
+        <div class="toolbar-search">
+            <span class="material-icons">search</span>
+            <input type="text" id="readingSearch" placeholder="Search forms..." class="toolbar-search-input"
+                   aria-label="Search reading forms">
+        </div>
+    </div>
+
+    <div class="form-grid" id="readingFormGrid">
         @foreach (var num in Model)
         {
             <a asp-action="Quiz" asp-route-formNumber="@num" class="form-grid-card green">
@@ -35,4 +44,32 @@ else
             </a>
         }
     </div>
+
+    <div class="form-grid-empty" id="readingEmpty" hidden>
+        <i class="bi bi-search"></i>
+        <span>No forms match your search.</span>
+    </div>
+
+    <script>
+    (function () {
+        var search = document.getElementById('readingSearch');
+        var grid   = document.getElementById('readingFormGrid');
+        var empty  = document.getElementById('readingEmpty');
+        if (!search || !grid) return;
+
+        var cards = grid.querySelectorAll('.form-grid-card');
+
+        search.addEventListener('input', function () {
+            var term  = this.value.trim().toLowerCase();
+            var shown = 0;
+            cards.forEach(function (card) {
+                var label = (card.querySelector('.form-grid-card-label')?.textContent || '').toLowerCase();
+                var match = !term || label.indexOf(term) !== -1;
+                card.style.display = match ? '' : 'none';
+                if (match) shown++;
+            });
+            if (empty) empty.hidden = shown !== 0;
+        });
+    })();
+    </script>
 }

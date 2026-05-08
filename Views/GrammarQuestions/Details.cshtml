@@ -19,6 +19,10 @@
             <span class="detail-val">@Html.DisplayFor(m => m.GrammarType)</span>
         </div>
         <div class="detail-row">
+            <span class="detail-key">Level</span>
+            <span class="detail-val">@(string.IsNullOrWhiteSpace(Model.Level) ? "—" : Model.Level)</span>
+        </div>
+        <div class="detail-row">
             <span class="detail-key">Question</span>
             <span class="detail-val">@Html.DisplayFor(m => m.QuestionText)</span>
         </div>
@@ -41,6 +45,10 @@
         <div class="detail-row">
             <span class="detail-key">Correct Answer</span>
             <span class="detail-val">Option @Model.CorrectOption</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-key">Explanation</span>
+            <span class="detail-val">@(string.IsNullOrWhiteSpace(Model.Explanation) ? "—" : Model.Explanation)</span>
         </div>
 
         <div class="form-actions mt-5">

@@ -20,21 +20,22 @@
     <div class="toolbar-filters">
         <select id="grammarTypeFilter" class="toolbar-select">
             <option value="">All Types</option>
-            <option value="Present Simple">Present Simple</option>
-            <option value="Past Simple">Past Simple</option>
-            <option value="Present Continuous">Present Continuous</option>
-            <option value="Past Continuous">Past Continuous</option>
-            <option value="Present Perfect">Present Perfect</option>
-            <option value="Past Perfect">Past Perfect</option>
-            <option value="Future Simple">Future Simple</option>
+            <option value="Tenses">Tenses</option>
+            <option value="Articles">Articles</option>
             <option value="Modals">Modals</option>
             <option value="Passive Voice">Passive Voice</option>
             <option value="Conditionals">Conditionals</option>
             <option value="Relative Clauses">Relative Clauses</option>
             <option value="Reported Speech">Reported Speech</option>
             <option value="Prepositions">Prepositions</option>
-            <option value="Articles">Articles</option>
             <option value="Conjunctions">Conjunctions</option>
+            <option value="Inversions &amp; Emphasis">Inversions &amp; Emphasis</option>
+        </select>
+        <select id="grammarLevelFilter" class="toolbar-select" aria-label="Difficulty level">
+            <option value="">All Levels</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
         </select>
     </div>
 </div>
@@ -45,6 +46,7 @@
             <tr>
                 <th>Q#</th>
                 <th>Type</th>
+                <th>Level</th>
                 <th>Question</th>
                 <th>Option A</th>
                 <th>Option B</th>
@@ -70,7 +72,8 @@
                 type: 'GET',
                 data: function (d) {
                     d.search = $('#grammarSearch').val();
-                    d.typeFilter = $('#grammarTypeFilter').val();
+                    d.typeFilter  = $('#grammarTypeFilter').val();
+                    d.levelFilter = $('#grammarLevelFilter').val();
                     return d;
                 },
                 error: function (xhr, error, thrown) {
@@ -80,6 +83,17 @@
             columns: [
                 { data: 'qno',         title: 'Q#',       width: '55px'  },
                 { data: 'grammarType', title: 'Type',     width: '160px' },
+                {
+                    data: 'level', title: 'Level', width: '110px',
+                    render: function (lvl) {
+                        if (!lvl) return '<span style="color:var(--t3)">—</span>';
+                        var c = lvl === 'Beginner'     ? 'var(--em-600)'
+                              : lvl === 'Intermediate' ? 'var(--blue-600)'
+                              : lvl === 'Advanced'     ? 'var(--violet-600)'
+                              :                          'var(--t2)';
+                        return '<span style="display:inline-block;padding:2px 9px;border-radius:99px;background:color-mix(in srgb,' + c + ' 14%,transparent);color:' + c + ';font-size:.7rem;font-weight:700;letter-spacing:.04em">' + lvl + '</span>';
+                    }
+                },
                 { data: 'questionText',title: 'Question'                 },
                 { data: 'optionA',     title: 'Option A'                 },
                 { data: 'optionB',     title: 'Option B'                 },
@@ -122,7 +136,7 @@
             }, 300);
         });
 
-        $('#grammarTypeFilter').on('change', function() {
+        $('#grammarTypeFilter, #grammarLevelFilter').on('change', function() {
             grammarTable.draw();
         });
     });

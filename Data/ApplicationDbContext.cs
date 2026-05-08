@@ -53,12 +53,14 @@ namespace ECL.Data
                 e.HasKey(x => x.Qno);
                 e.Property(x => x.Qno).HasColumnName("qno");
                 e.Property(x => x.GrammarType).HasColumnName("grammartype");
+                e.Property(x => x.Level).HasColumnName("level");
                 e.Property(x => x.QuestionText).HasColumnName("questiontext");
                 e.Property(x => x.OptionA).HasColumnName("optiona");
                 e.Property(x => x.OptionB).HasColumnName("optionb");
                 e.Property(x => x.OptionC).HasColumnName("optionc");
                 e.Property(x => x.OptionD).HasColumnName("optiond");
                 e.Property(x => x.CorrectOption).HasColumnName("correctoption");
+                e.Property(x => x.Explanation).HasColumnName("explanation");
             });
         }
     }

@@ -1,4 +1,4 @@
-@model List<string>
+@model ECL.Models.GrammarStartQuizViewModel
 @{
     ViewData["Title"] = "Grammar Quiz";
 }
@@ -11,7 +11,7 @@
     </div>
 }
 
-@if (!Model.Any())
+@if (!Model.Topics.Any())
 {
     <div class="alert-warning">
         <i class="bi bi-exclamation-triangle"></i>
@@ -22,17 +22,45 @@ else
 {
     <p class="muted-note">
         Choose a grammar topic to begin your practice session.
+        @if (Model.Levels.Any())
+        {
+            <text>Pick a difficulty to focus your practice.</text>
+        }
     </p>
 
-    <div class="grammar-toolbar">
-        <div class="toolbar-search">
-            <span class="material-icons">search</span>
-            <input type="text" id="grammarSearch" placeholder="Search grammar types..." class="toolbar-search-input">
+    @if (Model.Levels.Any())
+    {
+        <div class="grammar-toolbar" style="gap:16px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <span class="field-label" style="margin:0">Difficulty</span>
+                <div class="level-chip-group" id="levelChipGroup" role="tablist" aria-label="Difficulty level">
+                    <button type="button" class="level-chip is-active" data-level="" role="tab" aria-selected="true">All Levels</button>
+                    @foreach (var level in Model.Levels)
+                    {
+                        <button type="button" class="level-chip" data-level="@level" role="tab" aria-selected="false">@level</button>
+                    }
+                </div>
+            </div>
+            <div class="toolbar-search" style="flex:1;min-width:220px">
+                <span class="material-icons">search</span>
+                <input type="text" id="grammarSearch" placeholder="Search grammar types..." class="toolbar-search-input">
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="grammar-toolbar">
+            <div class="toolbar-search">
+                <span class="material-icons">search</span>
+                <input type="text" id="grammarSearch" placeholder="Search grammar types..." class="toolbar-search-input">
+            </div>
+        </div>
+    }
 
     <div class="form-grid" id="grammarFormGrid">
-        <a asp-action="RandomQuiz" asp-route-count="20" class="form-grid-card blue">
+        <a href="@Url.Action("RandomQuiz", new { count = 20 })"
+           class="form-grid-card blue"
+           data-base-href="@Url.Action("RandomQuiz", new { count = 20 })">
             <div class="form-num blue">
                 <i class="bi bi-shuffle"></i>
             </div>
@@ -41,9 +69,11 @@ else
                 <i class="bi bi-play-fill"></i> Start
             </div>
         </a>
-        @foreach (var t in Model)
+        @foreach (var t in Model.Topics)
         {
-            <a asp-action="Quiz" asp-route-grammarType="@t" class="form-grid-card purple">
+            <a href="@Url.Action("Quiz", new { grammarType = t })"
+               class="form-grid-card purple"
+               data-base-href="@Url.Action("Quiz", new { grammarType = t })">
                 <div class="form-num purple">
                     <i class="bi bi-spellcheck"></i>
                 </div>
@@ -55,19 +85,87 @@ else
         }
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var searchInput = document.getElementById('grammarSearch');
-        var cards = document.querySelectorAll('#grammarFormGrid .form-grid-card');
+    <style>
+        .level-chip-group { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+        .level-chip {
+            padding: 6px 14px;
+            border: 1.5px solid var(--field-border);
+            border-radius: 99px;
+            font-size: .78rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--t2);
+            background: var(--field-bg);
+            font-family: inherit;
+            transition: all var(--speed);
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+        .level-chip:hover { color: var(--t1); border-color: var(--violet-400); }
+        .level-chip.is-active {
+            background: var(--violet-600);
+            border-color: var(--violet-600);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, .32);
+        }
+    </style>
 
-        searchInput.addEventListener('input', function() {
-            var term = this.value.toLowerCase();
-            cards.forEach(function(card) {
-                var label = card.querySelector('.form-grid-card-label').textContent.toLowerCase();
-                card.style.display = label.indexOf(term) !== -1 ? '' : 'none';
+    <script>
+    (function () {
+        var STORAGE_KEY = 'ecl.grammar.startQuiz.level';
+        var grid     = document.getElementById('grammarFormGrid');
+        var search   = document.getElementById('grammarSearch');
+        var chipGrp  = document.getElementById('levelChipGroup');
+        var cards    = grid.querySelectorAll('.form-grid-card');
+
+        var saved = '';
+        try { saved = localStorage.getItem(STORAGE_KEY) || ''; } catch (_) { /* ignore */ }
+
+        function applyLevel(level) {
+            try { localStorage.setItem(STORAGE_KEY, level); } catch (_) { /* ignore */ }
+
+            if (chipGrp) {
+                chipGrp.querySelectorAll('.level-chip').forEach(function (c) {
+                    var active = (c.dataset.level || '') === level;
+                    c.classList.toggle('is-active', active);
+                    c.setAttribute('aria-selected', active ? 'true' : 'false');
+                });
+            }
+
+            cards.forEach(function (card) {
+                var base = card.getAttribute('data-base-href') || card.getAttribute('href');
+                if (!base) return;
+                if (level) {
+                    var sep = base.indexOf('?') === -1 ? '?' : '&';
+                    card.setAttribute('href', base + sep + 'level=' + encodeURIComponent(level));
+                } else {
+                    card.setAttribute('href', base);
+                }
             });
-        });
-    });
+        }
+
+        if (chipGrp) {
+            // Restore saved level only if a chip exists for it.
+            var hasSaved = !!chipGrp.querySelector('.level-chip[data-level="' + (saved || '') + '"]');
+            applyLevel(hasSaved ? saved : '');
+
+            chipGrp.addEventListener('click', function (e) {
+                var btn = e.target.closest('.level-chip');
+                if (!btn) return;
+                applyLevel(btn.dataset.level || '');
+            });
+        }
+
+        if (search) {
+            search.addEventListener('input', function () {
+                var term = this.value.toLowerCase();
+                cards.forEach(function (card) {
+                    var label = card.querySelector('.form-grid-card-label').textContent.toLowerCase();
+                    card.style.display = label.indexOf(term) !== -1 ? '' : 'none';
+                });
+            });
+        }
+    })();
     </script>
 }
-

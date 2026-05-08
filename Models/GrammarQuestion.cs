@@ -5,6 +5,15 @@ namespace ECL.Models
 {
     public class GrammarQuestion
     {
+        public const string LevelBeginner     = "Beginner";
+        public const string LevelIntermediate = "Intermediate";
+        public const string LevelAdvanced     = "Advanced";
+
+        public static readonly string[] AllowedLevels = new[]
+        {
+            LevelBeginner, LevelIntermediate, LevelAdvanced
+        };
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Display(Name = "Question Number")]
@@ -12,6 +21,9 @@ namespace ECL.Models
 
         [Display(Name = "Grammar Type")]
         public string GrammarType { get; set; } = string.Empty;
+
+        [Display(Name = "Difficulty Level")]
+        public string? Level { get; set; }
 
         [Display(Name = "Question Text")]
         public string QuestionText { get; set; } = string.Empty;
@@ -30,6 +42,10 @@ namespace ECL.Models
 
         [Display(Name = "Correct Option")]
         public int CorrectOption { get; set; }
+
+        [Display(Name = "Explanation")]
+        [DataType(DataType.MultilineText)]
+        public string? Explanation { get; set; }
     }
 }
 

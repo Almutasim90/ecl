@@ -132,9 +132,40 @@ function initDesktopCollapse() {
   });
 }
 
+// ── Active link highlighting ───────────────────────────────────────────────
+// Adds `.active` to the .slink whose href best matches the current URL,
+// preferring an exact path match, then a controller-segment match.
+function initActiveLink() {
+  const links = document.querySelectorAll('.sidebar a.slink');
+  if (!links.length) return;
+
+  const currentPath = (location.pathname || '/').replace(/\/+$/, '') || '/';
+  const currentSeg  = currentPath.split('/').filter(Boolean)[0] || '';
+
+  let exact = null;
+  let segment = null;
+
+  links.forEach((a) => {
+    const href = (a.getAttribute('href') || '').replace(/\/+$/, '') || '/';
+    if (href === currentPath) exact = a;
+    const seg = href.split('/').filter(Boolean)[0] || '';
+    if (!segment && seg && seg.toLowerCase() === currentSeg.toLowerCase()) {
+      segment = a;
+    }
+  });
+
+  const winner = exact || segment;
+  if (winner) winner.classList.add('active');
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => { initDrawer(); initDesktopCollapse(); });
+  document.addEventListener('DOMContentLoaded', () => {
+    initDrawer();
+    initDesktopCollapse();
+    initActiveLink();
+  });
 } else {
   initDrawer();
   initDesktopCollapse();
+  initActiveLink();
 }

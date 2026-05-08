@@ -17,10 +17,22 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="alert-error"></div>
 
-            <div class="field-group">
-                <label asp-for="GrammarType" class="field-label"></label>
-                <input asp-for="GrammarType" class="field-input" placeholder="e.g. Tenses" />
-                <span asp-validation-for="GrammarType" class="field-error"></span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                <div class="field-group">
+                    <label asp-for="GrammarType" class="field-label"></label>
+                    <input asp-for="GrammarType" class="field-input" placeholder="e.g. Tenses, Inversions & Emphasis" />
+                    <span asp-validation-for="GrammarType" class="field-error"></span>
+                </div>
+                <div class="field-group">
+                    <label asp-for="Level" class="field-label"></label>
+                    <select asp-for="Level" class="field-input">
+                        <option value="">— None / Mixed —</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                    <span asp-validation-for="Level" class="field-error"></span>
+                </div>
             </div>
 
             <div class="field-group">
@@ -65,6 +77,12 @@
                     <label for="co4">D</label>
                 </div>
                 <span asp-validation-for="CorrectOption" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Explanation" class="field-label"></label>
+                <textarea asp-for="Explanation" class="field-input" rows="2" placeholder="Optional. Brief grammar tip shown after the user answers."></textarea>
+                <span asp-validation-for="Explanation" class="field-error"></span>
             </div>
 
             <div class="form-actions">

@@ -1,7 +1,9 @@
 @model List<ECL.Models.GrammarQuestion>
 @using System.Text.Json
 @{
-    ViewData["Title"] = "Grammar Quiz · " + ViewBag.GrammarType;
+    var level = (string?)ViewBag.Level;
+    ViewData["Title"] = "Grammar Quiz · " + ViewBag.GrammarType
+        + (string.IsNullOrWhiteSpace(level) ? string.Empty : " · " + level);
 }
 
 <div class="quiz-page-wrap">
@@ -9,9 +11,18 @@
 
         <div class="quiz-card-header-primary">
             <h4><i class="bi bi-spellcheck"></i> Grammar Quiz — @ViewBag.GrammarType</h4>
-            <div class="quiz-progress-pill">
-                <i class="bi bi-list-ol"></i>
-                <span id="progress-text">Question 1 of @Model.Count</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <div class="quiz-progress-pill">
+                    <i class="bi bi-list-ol"></i>
+                    <span id="progress-text">Question 1 of @Model.Count</span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(level))
+                {
+                    <div class="quiz-progress-pill" title="Difficulty">
+                        <i class="bi bi-bar-chart-steps"></i>
+                        <span>@level</span>
+                    </div>
+                }
             </div>
         </div>
 
@@ -52,6 +63,24 @@
 </div>
 
 @section Scripts {
+<style>
+    .quiz-explanation {
+        margin-top: 10px;
+        padding: 10px 14px;
+        border: 1px solid var(--alert-info-border);
+        background: var(--alert-info-bg);
+        color: var(--alert-info-text);
+        border-radius: 10px;
+        font-weight: 500;
+        text-align: left;
+        font-size: .82rem;
+        line-height: 1.5;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .quiz-explanation i { font-size: .95rem; margin-top: 2px; flex-shrink: 0; }
+</style>
 <script>
 const questions  = @Html.Raw(JsonSerializer.Serialize(Model));
 const total      = questions.length;
@@ -169,15 +198,29 @@ function submitHandler() {
     submitBtn.onclick     = nextHandler;
 }
 
+function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[ch]));
+}
+
 function applyResult(ans) {
     const sel = ans.choice ? optsEl.children[ans.choice - 1] : null;
     const cor = optsEl.children[questions[current].CorrectOption - 1];
     Array.from(optsEl.children).forEach(b => b.classList.remove('active'));
     if (sel) sel.classList.add(ans.correct ? 'correct' : 'wrong');
     if (!ans.correct && cor) cor.classList.add('correct');
-    feedbackEl.innerHTML = ans.correct
+
+    const verdict = ans.correct
         ? '<span class="quiz-score-ok">✓ Correct!</span>'
-        : `<span class="quiz-score-bad">✗ Wrong — Correct: <strong>${cor?.textContent ?? ''}</strong></span>`;
+        : `<span class="quiz-score-bad">✗ Wrong — Correct: <strong>${escapeHtml(cor?.textContent ?? '')}</strong></span>`;
+
+    const explanation = questions[current].Explanation;
+    const tip = explanation && String(explanation).trim().length
+        ? `<div class="quiz-explanation"><i class="bi bi-lightbulb"></i> ${escapeHtml(explanation)}</div>`
+        : '';
+
+    feedbackEl.innerHTML = verdict + tip;
 }
 
 function nextHandler() {

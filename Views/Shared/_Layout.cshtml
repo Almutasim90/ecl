@@ -41,20 +41,39 @@
         <aside id="sidebar" class="sidebar" role="navigation" aria-label="Primary navigation">
 
             <div class="sidebar-logo">
-                <a asp-controller="Home" asp-action="Index" class="sidebar-logo-link">
-                    <span class="sidebar-logo-icon">
-                        <i class="bi bi-soundwave"></i>
+                <a asp-controller="Home" asp-action="Index" class="sidebar-logo-link" data-label="ECL — Home">
+                    <span class="sidebar-logo-icon" aria-hidden="true">
+                        <i class="bi bi-mortarboard-fill"></i>
                     </span>
-                    <span class="sidebar-logo-text">ECL</span>
+                    <span class="sidebar-logo-text">
+                        <span class="sidebar-logo-name">ECL</span>
+                        <span class="sidebar-logo-sub">Learning Hub</span>
+                    </span>
                 </a>
             </div>
 
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="Primary">
                 <div class="nav-group">
                     <span class="nav-group-label">Overview</span>
-                    <a class="slink" asp-controller="Home" asp-action="Index">
-                        <i class="bi bi-grid-1x2"></i>
+                    <a class="slink" data-label="Dashboard" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-grid-1x2-fill"></i>
                         <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-group">
+                    <span class="nav-group-label">Practice</span>
+                    <a class="slink" data-label="Listening Quiz" asp-controller="ListeningQuestions" asp-action="StartQuiz">
+                        <i class="bi bi-headphones"></i>
+                        <span>Listening Quiz</span>
+                    </a>
+                    <a class="slink" data-label="Reading Quiz" asp-controller="ReadingQuestions" asp-action="StartQuiz">
+                        <i class="bi bi-book-half"></i>
+                        <span>Reading Quiz</span>
+                    </a>
+                    <a class="slink" data-label="Grammar Quiz" asp-controller="GrammarQuestions" asp-action="StartQuiz">
+                        <i class="bi bi-spellcheck"></i>
+                        <span>Grammar Quiz</span>
                     </a>
                 </div>
 
@@ -62,41 +81,26 @@
                 {
                     <div class="nav-group">
                         <span class="nav-group-label">Manage</span>
-                        <a class="slink" asp-controller="ListeningQuestions" asp-action="Index">
-                            <i class="bi bi-headphones"></i>
-                            <span>Listening Questions</span>
+                        <a class="slink" data-label="Listening Bank" asp-controller="ListeningQuestions" asp-action="Index">
+                            <i class="bi bi-collection"></i>
+                            <span>Listening Bank</span>
                         </a>
-                        <a class="slink" asp-controller="ReadingQuestions" asp-action="Index">
+                        <a class="slink" data-label="Reading Bank" asp-controller="ReadingQuestions" asp-action="Index">
                             <i class="bi bi-journal-text"></i>
-                            <span>Reading Questions</span>
+                            <span>Reading Bank</span>
                         </a>
-                        <a class="slink" asp-controller="GrammarQuestions" asp-action="Index">
-                            <i class="bi bi-spellcheck"></i>
-                            <span>Grammar Questions</span>
+                        <a class="slink" data-label="Grammar Bank" asp-controller="GrammarQuestions" asp-action="Index">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Grammar Bank</span>
                         </a>
                     </div>
                 }
-
-                <div class="nav-group">
-                    <span class="nav-group-label">Practice</span>
-                    <a class="slink" asp-controller="ListeningQuestions" asp-action="StartQuiz">
-                        <i class="bi bi-headphones-simple"></i>
-                        <span>Listening Quiz</span>
-                    </a>
-                    <a class="slink" asp-controller="ReadingQuestions" asp-action="StartQuiz">
-                        <i class="bi bi-book-open"></i>
-                        <span>Reading Quiz</span>
-                    </a>
-                    <a class="slink" asp-controller="GrammarQuestions" asp-action="StartQuiz">
-                        <i class="bi bi-spellcheck"></i>
-                        <span>Grammar Quiz</span>
-                    </a>
-                </div>
             </nav>
 
             <div class="sidebar-footer">
-                <a asp-controller="Home" asp-action="Privacy" class="sidebar-footer-link">
-                    <i class="bi bi-shield-check"></i> Privacy
+                <a asp-controller="Home" asp-action="Privacy" class="sidebar-footer-link" data-label="Privacy">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Privacy</span>
                 </a>
             </div>
 
