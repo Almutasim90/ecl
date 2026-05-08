@@ -40,6 +40,47 @@
   --t3: #8ea4c7;
 }
 
+/* Sidebar + nav colors in dark mode (site.css uses hardcoded white alphas) */
+[data-theme='dark'] .sidebar {
+  background: linear-gradient(180deg, #060a17 0%, var(--sb-bg) 55%, #050814 100%);
+  border-right-color: var(--sb-border);
+}
+
+[data-theme='dark'] .sidebar-logo-text {
+  color: var(--t1);
+}
+
+[data-theme='dark'] .nav-group-label {
+  color: rgba(183, 199, 228, 0.55);
+}
+
+[data-theme='dark'] .slink {
+  color: rgba(241, 245, 255, 0.68);
+}
+
+[data-theme='dark'] .slink:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(241, 245, 255, 0.95);
+}
+
+[data-theme='dark'] .slink.active {
+  background: rgba(124, 58, 237, 0.22);
+  color: #d7ccff;
+}
+
+[data-theme='dark'] .slink.active::before {
+  background: linear-gradient(180deg, #a78bfa, #7c3aed);
+}
+
+[data-theme='dark'] .sidebar-footer-link {
+  color: rgba(183, 199, 228, 0.48);
+}
+
+[data-theme='dark'] .sidebar-footer-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(241, 245, 255, 0.8);
+}
+
 /* =============================================================================
    Login page
    ============================================================================= */
