@@ -1,6 +1,10 @@
 using System.Threading.RateLimiting;
+using System.Security.Claims;
 using ECL.Data;
 using ECL.Filters;
+using ECL.Models;
+using ECL.Security;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +13,72 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews(o => o.Filters.Add<DatabaseExceptionFilter>());
 builder.Services.AddRazorPages();
+
+// ── AuthN/AuthZ ────────────────────────────────────────────────────────────
+builder.Services.Configure<AdminCredentialsOptions>(
+    builder.Configuration.GetSection(AdminCredentialsOptions.SectionName));
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(o =>
+    {
+        o.LoginPath = "/Account/Login";
+        o.LogoutPath = "/Account/Logout";
+        o.AccessDeniedPath = "/Account/AccessDenied";
+        o.SlidingExpiration = true;
+
+        // For APIs, don't redirect to HTML pages; return proper status codes.
+        o.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = ctx =>
+            {
+                if (ctx.Request.Path.StartsWithSegments("/api"))
+                {
+                    ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                }
+
+                ctx.Response.Redirect(ctx.RedirectUri);
+                return Task.CompletedTask;
+            },
+            OnRedirectToAccessDenied = ctx =>
+            {
+                if (ctx.Request.Path.StartsWithSegments("/api"))
+                {
+                    ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                }
+
+                ctx.Response.Redirect(ctx.RedirectUri);
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+// Register Test auth scheme always (disabled by default) so policies can reference it safely.
+builder.Services
+    .AddAuthentication()
+    .AddScheme<TestAuthOptions, TestAuthHandler>(TestAuthDefaults.SchemeName, o =>
+    {
+        o.Enabled =
+            builder.Environment.IsEnvironment("Testing") ||
+            builder.Configuration.GetValue("TestAuth:Enabled", false);
+        o.HeaderName = builder.Configuration["TestAuth:HeaderName"] ?? "X-Test-Auth";
+        o.HeaderValue = builder.Configuration["TestAuth:HeaderValue"] ?? "admin";
+    });
+
+builder.Services.AddAuthorization(o =>
+{
+    o.AddPolicy("Questions.Read", p => p
+        .AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme, TestAuthDefaults.SchemeName)
+        .RequireAuthenticatedUser()
+        .RequireRole("Admin"));
+
+    o.AddPolicy("Questions.Write", p => p
+        .AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme, TestAuthDefaults.SchemeName)
+        .RequireAuthenticatedUser()
+        .RequireRole("Admin"));
+});
 
 // ── CORS ──────────────────────────────────────────────────────────────────
 // Web origin comes from env (production) or falls back to localhost for dev.
@@ -59,9 +129,13 @@ using (var scope = app.Services.CreateScope())
     try
     {
         if (await db.Database.CanConnectAsync())
+        {
             await db.Database.MigrateAsync();
+        }
         else
+        {
             logger.LogWarning("Database unreachable at startup — app will run; pages will show a connection message.");
+        }
     }
     catch (Exception ex)
     {
@@ -81,6 +155,9 @@ else
 
 app.UseRouting();
 app.UseCors("AppPolicy");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseRateLimiter();
 

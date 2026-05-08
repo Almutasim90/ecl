@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ECL.Data;
@@ -5,6 +6,7 @@ using ECL.Models;
 
 namespace ECL.Controllers
 {
+    [Authorize(Policy = "Questions.Read")]
     public class ListeningQuestionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -94,6 +96,7 @@ namespace ECL.Controllers
         }
 
         // GET: ListeningQuestions/Create
+        [Authorize(Policy = "Questions.Write")]
         public IActionResult Create()
         {
             return View();
@@ -103,6 +106,7 @@ namespace ECL.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Policy = "Questions.Write")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Qno,FormNumber,AudioFile,OptionA,OptionB,OptionC,OptionD,CorrectOption")] ListeningQuestion listeningQuestion)
         {
@@ -116,6 +120,7 @@ namespace ECL.Controllers
         }
 
         // GET: ListeningQuestions/Edit/5
+        [Authorize(Policy = "Questions.Write")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -135,6 +140,7 @@ namespace ECL.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Policy = "Questions.Write")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Qno,FormNumber,AudioFile,OptionA,OptionB,OptionC,OptionD,CorrectOption")] ListeningQuestion listeningQuestion)
         {
@@ -167,6 +173,7 @@ namespace ECL.Controllers
         }
 
         // GET: ListeningQuestions/Delete/5
+        [Authorize(Policy = "Questions.Write")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -186,6 +193,7 @@ namespace ECL.Controllers
 
         // POST: ListeningQuestions/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Policy = "Questions.Write")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -200,6 +208,7 @@ namespace ECL.Controllers
         }
 
         // GET: ListeningQuestions/StartQuiz
+        [AllowAnonymous]
         public async Task<IActionResult> StartQuiz()
         {
             try
@@ -219,6 +228,7 @@ namespace ECL.Controllers
         }
 
         // GET: ListeningQuestions/Quiz/5
+        [AllowAnonymous]
         public async Task<IActionResult> Quiz(int formNumber)
         {
             try

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using ECL.Models;
 
 namespace ECL.Controllers
 {
+    [Authorize(Policy = "Questions.Read")]
     public class ReadingQuestionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -100,6 +102,7 @@ namespace ECL.Controllers
         }
 
         // GET: ReadingQuestions/Create
+        [Authorize(Policy = "Questions.Write")]
         public IActionResult Create()
         {
             return View();
@@ -109,6 +112,7 @@ namespace ECL.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Policy = "Questions.Write")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Qno,FormNumber,QuestionText,OptionA,OptionB,OptionC,OptionD,CorrectOption")] ReadingQuestion readingQuestion)
         {
@@ -122,6 +126,7 @@ namespace ECL.Controllers
         }
 
         // GET: ReadingQuestions/Edit/5
+        [Authorize(Policy = "Questions.Write")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -141,6 +146,7 @@ namespace ECL.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize(Policy = "Questions.Write")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Qno,FormNumber,QuestionText,OptionA,OptionB,OptionC,OptionD,CorrectOption")] ReadingQuestion readingQuestion)
         {
@@ -173,6 +179,7 @@ namespace ECL.Controllers
         }
 
         // GET: ReadingQuestions/Delete/5
+        [Authorize(Policy = "Questions.Write")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -192,6 +199,7 @@ namespace ECL.Controllers
 
         // POST: ReadingQuestions/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Policy = "Questions.Write")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -206,6 +214,7 @@ namespace ECL.Controllers
         }
 
         // GET: ReadingQuestions/StartQuiz
+        [AllowAnonymous]
         public async Task<IActionResult> StartQuiz()
         {
             try
@@ -225,6 +234,7 @@ namespace ECL.Controllers
         }
 
         // GET: ReadingQuestions/Quiz/5
+        [AllowAnonymous]
         public async Task<IActionResult> Quiz(int formNumber)
         {
             try

@@ -1,0 +1,59 @@
+@model ECL.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-mark" aria-hidden="true">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <div class="auth-title">Admin login</div>
+                <div class="auth-subtitle">Sign in to manage questions</div>
+            </div>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert-error">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form asp-action="Login" method="post" autocomplete="off" class="auth-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="field-group">
+                <label asp-for="Username" class="field-label"></label>
+                <input asp-for="Username" class="field-input auth-input" inputmode="text" autocomplete="username" />
+                <span asp-validation-for="Username" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Password" class="field-label"></label>
+                <input asp-for="Password" class="field-input auth-input" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>Sign in</span>
+            </button>
+
+            <div class="auth-hint">
+                Tip: keep credentials in environment variables (<code>AdminCredentials__*</code>).
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
