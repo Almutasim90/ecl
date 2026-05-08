@@ -238,36 +238,59 @@ a {
 }
 
 /* =============================================================================
-   SIDEBAR — v2 (cohesive with content surface)
-   • Tablet & up (≥768px): sticky in-flow card; collapses to icon-rail (76px)
-   • Mobile (<768px): fixed overlay drawer
-   • Light & dark: matches --card-bg / --card-border so it reads as part of
-     the same surface family as dashboard cards.
+   SIDEBAR — v3 (flush-edge, brand-aligned with topbar)
+   • Tablet & up (≥768px): full-height pinned to viewport edge; collapses to
+     icon-rail (76px). Right border separates it from content.
+   • Mobile (<768px): fixed overlay drawer.
+   • Light & dark: uses --card-bg / --card-border tokens for consistent surface.
    ============================================================================= */
 .sidebar {
   position: sticky;
-  top: 16px;
+  top: 0;
   align-self: flex-start;
   width: var(--sb-w);
   min-width: var(--sb-w);
-  height: calc(100vh - 32px);
-  margin: 16px 0 16px 16px;
+  height: 100vh;
+  margin: 0;
   background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--sb-radius);
-  box-shadow: var(--card-shadow);
+  border: 0;
+  border-right: 1px solid var(--card-border);
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   z-index: 10;
-  overflow: hidden;
+  overflow: visible; /* allow rail-mode tooltips and right-edge accent to paint */
   transition: width var(--sb-speed), min-width var(--sb-speed),
-              border-color var(--sb-speed), box-shadow var(--sb-speed);
+              border-color var(--sb-speed);
+}
+
+/* Subtle brand accent line along the sidebar's right edge */
+.sidebar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -1px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--violet-500) 35%, transparent) 12%,
+    color-mix(in srgb, var(--violet-500) 12%, transparent) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: .6;
 }
 
 [data-theme="dark"] .sidebar {
   /* slightly more "lifted" than body bg, like an elevated rail card */
   background: color-mix(in srgb, var(--card-bg) 92%, #0b1428 8%);
+}
+
+[data-theme="dark"] .sidebar::after {
+  opacity: .8;
 }
 
 .sidebar::-webkit-scrollbar { width: 4px; }
@@ -673,21 +696,17 @@ a {
 
   .sidebar {
     position: fixed;
-    inset-block: 0;
+    top: 0;
     left: 0;
     height: 100dvh;
-    margin: 0;
-    border-radius: 0;
-    border: 0;
-    border-right: 1px solid var(--card-border);
     z-index: 1050;
     transform: translateX(calc(-1 * var(--sb-w)));
     transition: transform var(--sb-speed);
     will-change: transform;
-    box-shadow: none;
   }
 
-  .sidebar-logo::after { left: 0; right: 0; }
+  /* Hide right-edge brand line on the off-canvas drawer */
+  .sidebar::after { display: none; }
 
   body.drawer-open .sidebar {
     transform: translateX(0);
@@ -710,21 +729,65 @@ a {
   flex-direction: column;
 }
 
-/* Topbar */
+/* Topbar — flush against sidebar; aligns with sidebar logo block height */
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   height: var(--topbar-h);
-  background: color-mix(in srgb, var(--card-bg) 75%, transparent);
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--card-border);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  position: sticky;
+  background: color-mix(in srgb, var(--card-bg) 82%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .03);
+}
+
+/* Soft violet halo on the topbar's bottom edge — extends the brand identity */
+.topbar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--violet-500) 28%, transparent) 25%,
+    color-mix(in srgb, var(--violet-500) 14%, transparent) 75%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: .7;
+}
+
+/* =============================================================================
+   GLOBAL BRAND STRIPE — a 2px violet→indigo gradient across the entire
+   page top, sitting above the topbar AND the sidebar so the chrome reads
+   as one continuous brand surface.
+   ============================================================================= */
+body::before {
+  content: "";
+  position: fixed;
   top: 0;
-  z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, .02);
-  flex-shrink: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--violet-700) 0%,
+    var(--violet-500) 25%,
+    #6366f1 50%,
+    var(--violet-500) 75%,
+    var(--violet-700) 100%
+  );
+  z-index: 1200;
+  pointer-events: none;
 }
 
 .topbar-left {

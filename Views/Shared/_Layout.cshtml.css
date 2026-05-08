@@ -1,4 +1,6 @@
-﻿/* Legacy styles - modern theme system uses app.css variables */
+﻿/* Legacy styles - modern theme system uses app.css variables.
+   Anchor colour is inherited so layout/sidebar/topbar links can pick the
+   correct brand-violet via their own component classes. */
 
 a.navbar-brand {
   white-space: normal;
@@ -6,24 +8,16 @@ a.navbar-brand {
   word-break: break-all;
 }
 
-a {
-  color: var(--blue-600, #3b82f6);
-}
-
-[data-theme="dark"] a {
-  color: var(--blue-400, #60a5fa);
-}
-
 .btn-primary {
   color: #fff;
-  background-color: var(--primary-600, #7c3aed);
-  border-color: var(--primary-600, #7c3aed);
+  background-color: var(--violet-600, #7c3aed);
+  border-color: var(--violet-600, #7c3aed);
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: var(--primary-600, #7c3aed);
-  border-color: var(--primary-600, #7c3aed);
+  background-color: var(--violet-600, #7c3aed);
+  border-color: var(--violet-600, #7c3aed);
 }
 
 .border-top {
