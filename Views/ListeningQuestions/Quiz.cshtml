@@ -216,6 +216,13 @@ skipBtn.addEventListener('click', () => {
     if (current < total - 1) { current++; saveState(); loadQuestion(); }
 });
 
+document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'BUTTON' && e.target.classList.contains('quiz-option')) return;
+    if (e.key === 'ArrowLeft' && !prevBtn.disabled) { prevBtn.click(); e.preventDefault(); }
+    if (e.key === 'ArrowRight' && current < total - 1 && skipBtn) { skipBtn.click(); e.preventDefault(); }
+    if (e.key === 'Enter' && !submitBtn.disabled) { submitBtn.click(); e.preventDefault(); }
+});
+
 loadQuestion();
 </script>
 }

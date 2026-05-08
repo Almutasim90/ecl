@@ -26,12 +26,18 @@ namespace ECL.Controllers
             int start = 0,
             int length = 10,
             string? search = null,
+            string? typeFilter = null,
             string? orderColumn = "Qno",
             string? orderDir = "asc")
         {
             var query = _context.GrammarQuestions.AsNoTracking().AsQueryable();
 
             var recordsTotal = await query.CountAsync();
+
+            if (!string.IsNullOrWhiteSpace(typeFilter))
+            {
+                query = query.Where(x => x.GrammarType != null && x.GrammarType == typeFilter);
+            }
 
             if (!string.IsNullOrWhiteSpace(search))
             {

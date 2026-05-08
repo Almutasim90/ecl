@@ -12,6 +12,33 @@
     </a>
 </div>
 
+<div class="grammar-toolbar">
+    <div class="toolbar-search">
+        <span class="material-icons">search</span>
+        <input type="text" id="grammarSearch" placeholder="Search questions..." class="toolbar-search-input">
+    </div>
+    <div class="toolbar-filters">
+        <select id="grammarTypeFilter" class="toolbar-select">
+            <option value="">All Types</option>
+            <option value="Present Simple">Present Simple</option>
+            <option value="Past Simple">Past Simple</option>
+            <option value="Present Continuous">Present Continuous</option>
+            <option value="Past Continuous">Past Continuous</option>
+            <option value="Present Perfect">Present Perfect</option>
+            <option value="Past Perfect">Past Perfect</option>
+            <option value="Future Simple">Future Simple</option>
+            <option value="Modals">Modals</option>
+            <option value="Passive Voice">Passive Voice</option>
+            <option value="Conditionals">Conditionals</option>
+            <option value="Relative Clauses">Relative Clauses</option>
+            <option value="Reported Speech">Reported Speech</option>
+            <option value="Prepositions">Prepositions</option>
+            <option value="Articles">Articles</option>
+            <option value="Conjunctions">Conjunctions</option>
+        </select>
+    </div>
+</div>
+
 <div class="table-card">
     <table id="GrammarTable" class="display hover stripe w-full">
         <thead>
@@ -33,7 +60,7 @@
 @section Scripts {
     <script>
     $(function () {
-        $('#GrammarTable').DataTable({
+        var grammarTable = $('#GrammarTable').DataTable({
             serverSide:  true,
             processing:  true,
             responsive:  true,
@@ -42,14 +69,9 @@
                 url:  '@Url.Action("LoadData", "GrammarQuestions")',
                 type: 'GET',
                 data: function (d) {
-                    return {
-                        draw:        d.draw,
-                        start:       d.start,
-                        length:      d.length,
-                        search:      d.search.value,
-                        orderColumn: d.columns[d.order[0].column].data,
-                        orderDir:    d.order[0].dir
-                    };
+                    d.search = $('#grammarSearch').val();
+                    d.typeFilter = $('#grammarTypeFilter').val();
+                    return d;
                 },
                 error: function (xhr, error, thrown) {
                     console.error('DataTable AJAX error', xhr.status, thrown);
@@ -87,8 +109,21 @@
                     next:     '<span class="material-icons">chevron_right</span>'
                 },
                 info:    'Showing _START_–_END_ of _TOTAL_ questions',
-                search:  '<span class="material-icons align-middle" style="font-size:18px">search</span>'
+                search:  '',
+                searchPlaceholder: ''
             }
+        });
+
+        var searchTimeout;
+        $('#grammarSearch').on('keyup', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                grammarTable.draw();
+            }, 300);
+        });
+
+        $('#grammarTypeFilter').on('change', function() {
+            grammarTable.draw();
         });
     });
     </script>

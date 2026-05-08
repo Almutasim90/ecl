@@ -1,9 +1,10 @@
-// drawer.js — sidebar toggle for mobile/tablet (<1024px overlay mode)
-// On desktop (≥1024px) the sidebar is always visible in normal flex flow;
-// this script only activates the overlay drawer on smaller screens.
+// drawer.js — sidebar toggle for mobile (<768px overlay mode)
+// On tablet and up (≥768px) the sidebar is in the normal flex flow with a
+// collapse toggle in the topbar; this script only activates the overlay
+// drawer on phone-sized viewports.
 
 const STORAGE_KEY = 'ecl.drawer.open';
-const DESKTOP_BP  = 1024; // px — must match the CSS media query breakpoint
+const DESKTOP_BP  = 768; // px — must match the CSS media query breakpoint
 
 function isDesktop() {
   return window.matchMedia(`(min-width: ${DESKTOP_BP}px)`).matches;
@@ -109,7 +110,7 @@ function body_classList_remove_drawer_open() {
 }
 
 // ── Desktop sidebar collapse ───────────────────────────────────────────────
-const COLLAPSE_KEY = 'ecl.sidebar.collapsed';
+const COLLAPSE_KEY = 'ecl.sidebar.collapsed'; 
 
 function initDesktopCollapse() {
   const btn = document.getElementById('sidebar-desktop-toggle');

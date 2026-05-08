@@ -23,9 +23,17 @@ else
     <p class="muted-note">
         Choose a grammar topic to begin your practice session.
     </p>
-    <div class="form-grid">
-        <a asp-action="RandomQuiz" asp-route-count="20" class="form-grid-card">
-            <div class="form-num" style="background: color-mix(in srgb, var(--blue-500) 14%, transparent); color: var(--blue-600);">
+
+    <div class="grammar-toolbar">
+        <div class="toolbar-search">
+            <span class="material-icons">search</span>
+            <input type="text" id="grammarSearch" placeholder="Search grammar types..." class="toolbar-search-input">
+        </div>
+    </div>
+
+    <div class="form-grid" id="grammarFormGrid">
+        <a asp-action="RandomQuiz" asp-route-count="20" class="form-grid-card blue">
+            <div class="form-num blue">
                 <i class="bi bi-shuffle"></i>
             </div>
             <div class="form-grid-card-label">Random Mix</div>
@@ -35,8 +43,8 @@ else
         </a>
         @foreach (var t in Model)
         {
-            <a asp-action="Quiz" asp-route-grammarType="@t" class="form-grid-card">
-                <div class="form-num" style="background: color-mix(in srgb, var(--violet-500) 14%, transparent); color: var(--violet-600);">
+            <a asp-action="Quiz" asp-route-grammarType="@t" class="form-grid-card purple">
+                <div class="form-num purple">
                     <i class="bi bi-spellcheck"></i>
                 </div>
                 <div class="form-grid-card-label">@t</div>
@@ -46,5 +54,20 @@ else
             </a>
         }
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('grammarSearch');
+        var cards = document.querySelectorAll('#grammarFormGrid .form-grid-card');
+
+        searchInput.addEventListener('input', function() {
+            var term = this.value.toLowerCase();
+            cards.forEach(function(card) {
+                var label = card.querySelector('.form-grid-card-label').textContent.toLowerCase();
+                card.style.display = label.indexOf(term) !== -1 ? '' : 'none';
+            });
+        });
+    });
+    </script>
 }
 

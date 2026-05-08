@@ -35,7 +35,7 @@ function setTheme(theme, { persist = true } = {}) {
 document.addEventListener('DOMContentLoaded', function () {
     const toggle = document.getElementById('theme-toggle');
     const hasStored = !!getStoredTheme();
-    const currentTheme = document.documentElement.getAttribute('data-theme') || getSystemTheme();
+    const currentTheme = window.__initialTheme || document.documentElement.getAttribute('data-theme') || getSystemTheme();
 
     setTheme(currentTheme, { persist: hasStored });
 

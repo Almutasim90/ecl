@@ -13,6 +13,7 @@
                 theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
             document.documentElement.setAttribute('data-theme', theme);
+            window.__initialTheme = theme;
         })();
     </script>
     <script type="importmap"></script>
@@ -27,7 +28,7 @@
 </head>
 <body>
     <!-- Mobile hamburger -->
-    <button id="drawer-toggle" aria-label="Toggle menu" aria-expanded="false">
+    <button id="drawer-toggle" class="drawer-toggle" aria-label="Toggle menu" aria-expanded="false">
         <i class="bi bi-list"></i>
     </button>
 
@@ -106,16 +107,16 @@
 
             <!-- Topbar -->
             <header class="topbar">
+                <button id="sidebar-desktop-toggle" class="sidebar-desktop-toggle" aria-label="Toggle sidebar" title="Toggle sidebar">
+                    <i class="bi bi-layout-sidebar"></i>
+                </button>
                 <div class="topbar-left">
-                    <button id="sidebar-desktop-toggle" class="sidebar-desktop-toggle" aria-label="Toggle sidebar">
-                        <i class="bi bi-layout-sidebar"></i>
-                    </button>
                     <div class="topbar-page-title">@ViewData["Title"]</div>
                 </div>
                 <div class="topbar-right">
                     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" title="Toggle theme">
-                        <i id="theme-toggle-icon" class="bi bi-moon-stars"></i>
-                        <span id="theme-toggle-label">Dark</span>
+                        <i id="theme-toggle-icon" class="bi theme-icon"></i>
+                        <span id="theme-toggle-label"></span>
                     </button>
                     @if (User?.Identity?.IsAuthenticated == true)
                     {

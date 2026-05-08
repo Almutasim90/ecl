@@ -1,4 +1,4 @@
-# Supabase / PostgreSQL connection troubleshooting
+t# Supabase / PostgreSQL connection troubleshooting
 
 This app connects to a **PostgreSQL** database (self-hosted Supabase, e.g. `supabase.almutasim.site` or VPS IP).
 
