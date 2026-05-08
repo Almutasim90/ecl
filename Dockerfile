@@ -30,11 +30,10 @@ WORKDIR /app
 
 COPY --from=build /app/publish ./
 # Configure both HTTP (8081) and HTTPS (8082)
-ENV ASPNETCORE_URLS=http://+:8081;https://+:8082
+ENV ASPNETCORE_URLS=http://+:8081
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 # Expose both ports
 EXPOSE 8081
-EXPOSE 8082
 
 ENTRYPOINT ["dotnet", "ECL.dll"]
