@@ -2,6 +2,7 @@ using System.Threading.RateLimiting;
 using System.Security.Claims;
 using ECL.Data;
 using ECL.Filters;
+using ECL.Configuration;
 using ECL.Models;
 using ECL.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -97,46 +98,15 @@ builder.Services.AddCors(options =>
         .AllowCredentials()));
 
 // ── Database ──────────────────────────────────────────────────────────────
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")?.Trim();
-
-// Support common hosting convention: DATABASE_URL (postgres://user:pass@host:port/db)
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")?.Trim();
-if (!string.IsNullOrWhiteSpace(databaseUrl))
-{
-    // If it's already an Npgsql-style connection string, accept it.
-    if (databaseUrl.Contains("Host=", StringComparison.OrdinalIgnoreCase))
-    {
-        connectionString = databaseUrl;
-    }
-    else if (databaseUrl.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
-             databaseUrl.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
-    {
-        var uri = new Uri(databaseUrl);
-        var userInfo = uri.UserInfo.Split(':', 2);
-        var user = Uri.UnescapeDataString(userInfo.ElementAtOrDefault(0) ?? "");
-        var pass = Uri.UnescapeDataString(userInfo.ElementAtOrDefault(1) ?? "");
-        var db = uri.AbsolutePath.Trim('/'); // /dbname
-
-        var port = uri.IsDefaultPort ? 5432 : uri.Port;
-        connectionString = $"Host={uri.Host};Port={port};Database={db};Username={user};Password={pass}";
-
-        // e.g. ?sslmode=require from managed Postgres / Supabase connection strings
-        var query = uri.Query.TrimStart('?');
-        if (query.Contains("sslmode=require", StringComparison.OrdinalIgnoreCase) ||
-            query.Contains("sslmode=verify-full", StringComparison.OrdinalIgnoreCase) ||
-            query.Contains("sslmode=verify-ca", StringComparison.OrdinalIgnoreCase))
-        {
-            connectionString += ";SSL Mode=Require;Trust Server Certificate=true";
-        }
-    }
-}
-
+var connectionString = DatabaseConnectionResolver.Resolve(builder.Configuration);
 if (string.IsNullOrWhiteSpace(connectionString))
+{
     throw new InvalidOperationException(
-        "Database connection is not configured. Set DATABASE_URL or ConnectionStrings__DefaultConnection " +
-        "(Coolify / Docker: add these in the service environment). " +
-        "Inside Docker, Host=localhost targets the app container only; use your Postgres hostname, host.docker.internal " +
-        "(if Postgres is on the VPS host), or another service name on the same Docker network.");
+        "Database connection is not configured. In Coolify, add environment variables on the application " +
+        "(avoid docker-compose `${VAR:-}` for secrets — it injects empty values). " +
+        "Set one of: DATABASE_URL, ConnectionStrings__DefaultConnection, or PGHOST/PGDATABASE/PGUSER/PGPASSWORD " +
+        "(optional PGPORT, PGSSLMODE=require). Inside Docker, localhost is only valid if Postgres is in the same container.");
+}
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o

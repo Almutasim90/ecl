@@ -12,12 +12,8 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8081
       - ASPNETCORE_ENVIRONMENT=Production
       - WEB_ORIGIN=http://ecl.almutasim.site
-      # Required in production containers: appsettings "localhost" is the container itself.
-      # Set in Coolify (or .env): use your real Postgres host, or host.docker.internal if DB is on the VPS host.
-      - DATABASE_URL=${DATABASE_URL:-}
-      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection:-}
-      - AdminCredentials__Username=${AdminCredentials__Username:-}
-      - AdminCredentials__Password=${AdminCredentials__Password:-}
+      # DB credentials: define DATABASE_URL (and optional AdminCredentials__*) in Coolify → Environment Variables.
+      # Do NOT use ${VAR:-} here — Compose substitutes empty defaults and wipes Coolify-injected secrets.
     networks:
       - coolify
 
