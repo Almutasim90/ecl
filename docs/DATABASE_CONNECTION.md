@@ -32,6 +32,8 @@ Host=YOUR_HOST;Port=5432;Database=postgres;Username=postgres;Password=YOUR_PASSW
   Set `ConnectionStrings__DefaultConnection` to the full string, or set `DATABASE_URL` (the app uses `DATABASE_URL` if set).
 - **Option B — Config files:**  
   `appsettings.json` or `appsettings.Development.json` under `ConnectionStrings:DefaultConnection`.
+- **Option C — Local-only dev config (recommended for your machine):**  
+  Create `appsettings.Development.local.json` (this repo ignores `appsettings.*.local.json`). Put secrets there.
 - **Never** commit real passwords to git; use `.env` (from `.env.example`) and exclude `.env` from version control.
 
 ---
@@ -69,4 +71,4 @@ See `CONNECTION_TROUBLESHOOTING.md` for details and pooler options. This setup u
 | 1 | PostgreSQL Host, Port, Database, Username, Password | **Yes** | `ConnectionStrings:DefaultConnection` or `DATABASE_URL` |
 | 2 | Storage base URL | If you serve audio/assets from Supabase | Code or config (e.g. `SUPABASE_URL`) |
 
-The application does not use authentication or authorization. The **minimum** to run is a valid **PostgreSQL connection string** (Host, Port, Database, Username, Password) via `DefaultConnection` or `DATABASE_URL`.
+The app supports **optional student login** (to save progress) and **admin login** (to manage content). The **minimum** to run is still a valid **PostgreSQL connection string** (Host, Port, Database, Username, Password) via `ConnectionStrings:DefaultConnection` or `DATABASE_URL`.

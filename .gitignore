@@ -13,6 +13,7 @@ node_modules/
 *.user
 .env
 .env.local
+appsettings.*.local.json
 
 # IDE
 .vs/

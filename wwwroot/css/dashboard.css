@@ -1,0 +1,68 @@
+/* Dashboard-specific enhancements (charts + layout). */
+
+.dash-charts-grid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:16px;
+  margin-top:16px;
+}
+
+.dash-chart-card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:var(--card-radius);
+  box-shadow:var(--card-shadow);
+  padding:18px 18px 14px;
+  overflow:hidden;
+  min-width:0;
+}
+
+.dash-chart-card--wide{ grid-column:span 12; }
+.dash-chart-card--half{ grid-column:span 6; }
+
+.dash-chart-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.dash-chart-title{
+  font-weight:800;
+  letter-spacing:-0.02em;
+  font-size:1rem;
+  color:var(--t1);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.dash-chart-title i{ color:var(--t3); }
+
+.dash-chart-sub{
+  margin-top:3px;
+  font-size:.8rem;
+  color:var(--t3);
+  font-weight:600;
+}
+
+.dash-chart-meta{
+  font-size:.75rem;
+  color:var(--t3);
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.dash-chart-body{ margin-top:12px; position:relative; }
+
+/* Chart.js reads the element size; force a stable height. */
+canvas.dash-chart-canvas{ width:100% !important; height:240px !important; }
+canvas.dash-chart-canvas--short{ height:200px !important; }
+
+@media (max-width:991.98px){
+  .dash-chart-card--half{ grid-column:span 12; }
+  canvas.dash-chart-canvas{ height:220px !important; }
+}
+

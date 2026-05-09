@@ -10,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load optional local-only settings (ignored by git) for dev convenience.
+// Priority: env vars > appsettings.*.local.json > appsettings.json
+builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.local.json", optional: true, reloadOnChange: true);
+
 // Add services to the container.
 builder.Services.AddControllersWithViews(o => o.Filters.Add<DatabaseExceptionFilter>());
 builder.Services.AddRazorPages();
@@ -94,6 +98,29 @@ builder.Services.AddCors(options =>
 
 // ── Database ──────────────────────────────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")?.Trim();
+
+// Support common hosting convention: DATABASE_URL (postgres://user:pass@host:port/db)
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")?.Trim();
+if (!string.IsNullOrWhiteSpace(databaseUrl))
+{
+    // If it's already an Npgsql-style connection string, accept it.
+    if (databaseUrl.Contains("Host=", StringComparison.OrdinalIgnoreCase))
+    {
+        connectionString = databaseUrl;
+    }
+    else if (databaseUrl.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+             databaseUrl.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+    {
+        var uri = new Uri(databaseUrl);
+        var userInfo = uri.UserInfo.Split(':', 2);
+        var user = Uri.UnescapeDataString(userInfo.ElementAtOrDefault(0) ?? "");
+        var pass = Uri.UnescapeDataString(userInfo.ElementAtOrDefault(1) ?? "");
+        var db = uri.AbsolutePath.Trim('/'); // /dbname
+
+        var port = uri.IsDefaultPort ? 5432 : uri.Port;
+        connectionString = $"Host={uri.Host};Port={port};Database={db};Username={user};Password={pass}";
+    }
+}
 
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(

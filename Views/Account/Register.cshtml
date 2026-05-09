@@ -1,17 +1,17 @@
-@model ECL.Models.LoginViewModel
+@model ECL.Models.RegisterViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Create account";
 }
 
 <div class="auth-wrap">
     <div class="auth-card">
         <div class="auth-header">
             <div class="auth-mark" aria-hidden="true">
-                <i class="bi bi-box-arrow-in-right"></i>
+                <i class="bi bi-person-plus-fill"></i>
             </div>
             <div>
-                <div class="auth-title">Sign in</div>
-                <div class="auth-subtitle">Students can save progress. Admins can manage questions.</div>
+                <div class="auth-title">Create student account</div>
+                <div class="auth-subtitle">Save history, track progress, and resume later.</div>
             </div>
         </div>
 
@@ -25,7 +25,7 @@
             </div>
         }
 
-        <form asp-action="Login" method="post" autocomplete="off" class="auth-form">
+        <form asp-action="Register" method="post" autocomplete="off" class="auth-form">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="ReturnUrl" />
 
@@ -37,18 +37,24 @@
 
             <div class="field-group">
                 <label asp-for="Password" class="field-label"></label>
-                <input asp-for="Password" class="field-input auth-input" autocomplete="current-password" />
+                <input asp-for="Password" class="field-input auth-input" autocomplete="new-password" />
                 <span asp-validation-for="Password" class="field-error"></span>
             </div>
 
+            <div class="field-group">
+                <label asp-for="ConfirmPassword" class="field-label"></label>
+                <input asp-for="ConfirmPassword" class="field-input auth-input" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+            </div>
+
             <button type="submit" class="btn btn-primary auth-submit">
-                <i class="bi bi-box-arrow-in-right"></i>
-                <span>Sign in</span>
+                <i class="bi bi-check2-circle"></i>
+                <span>Create account</span>
             </button>
 
             <div class="muted-note" style="margin:10px 0 0;">
-                New here?
-                <a asp-controller="Account" asp-action="Register" style="font-weight:700;">Create a student account</a>
+                Already have an account?
+                <a asp-controller="Account" asp-action="Login" style="font-weight:700;">Sign in</a>
             </div>
         </form>
     </div>

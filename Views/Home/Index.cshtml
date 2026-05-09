@@ -1,10 +1,10 @@
 @model ECL.Models.DashboardViewModel
 @{
-    ViewData["Title"] = "Dashboard";
-    var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+    ViewData["Title"] = "Home";
     var totalForms = Model.TotalListeningReadingFormsCount;
     var totalTopics = Model.GrammarTopicsCount;
 }
+
 @if (ViewData["DashboardWarning"] is string msg)
 {
     <div class="alert-warning" role="alert">
@@ -14,64 +14,65 @@
 }
 
 <div class="dash-page">
-
-    @* ──────────────────────────────────────────────────────────────────
-       Hero — sets the marketing tone for the page.
-       Eyebrow • Headline • Lede • Inline metrics • Dual CTA
-       ────────────────────────────────────────────────────────────────── *@
-    <section class="dash-hero" aria-label="Welcome to ECL">
-        <div class="dash-hero__grid">
-            <div class="dash-hero__content">
-                <span class="dash-hero__eyebrow">
-                    <i class="bi bi-mortarboard-fill"></i> English Comprehension Learning
-                </span>
-                <h1 class="dash-hero__title">
-                    Master English at every level — <em>at your own pace</em>
-                </h1>
-                <p class="dash-hero__lede">
-                    Real exam-style practice across listening, reading, and grammar.
-                    Pick a form, focus on a topic, and build confidence one quiz at a time.
-                </p>
-                <div class="dash-hero__metrics" role="list">
-                    <span class="dash-hero__metric" role="listitem">
-                        <i class="bi bi-collection-fill"></i>
-                        <strong>@Model.TotalQuestionsCount</strong> questions
-                    </span>
-                    <span class="dash-hero__metric" role="listitem">
-                        <i class="bi bi-stack"></i>
-                        <strong>@totalForms</strong> exam forms
-                    </span>
-                    <span class="dash-hero__metric" role="listitem">
-                        <i class="bi bi-tags-fill"></i>
-                        <strong>@totalTopics</strong> grammar topics
-                    </span>
-                </div>
-                <div class="dash-hero__cta-row">
-                    <a asp-controller="ListeningQuestions" asp-action="StartQuiz" class="dash-hero__cta dash-hero__cta--primary">
-                        <i class="bi bi-play-circle-fill"></i>
-                        <span>Start practicing</span>
-                    </a>
-                    <a asp-controller="GrammarQuestions" asp-action="StartQuiz" class="dash-hero__cta dash-hero__cta--ghost">
-                        <i class="bi bi-compass"></i>
-                        <span>Browse grammar topics</span>
-                    </a>
-                </div>
+    <section aria-label="Home overview">
+        <div class="section-header">
+            <div class="section-header-text">
+                <h1 class="section-title">Welcome to ECL</h1>
+                <div class="section-subtitle">Choose a practice mode, or open the dashboard for deeper statistics.</div>
             </div>
-            <div class="dash-hero__visual" aria-hidden="true">
-                <span class="dash-hero__orb dash-hero__orb--a"></span>
-                <span class="dash-hero__orb dash-hero__orb--b"></span>
-                <i class="bi bi-stars dash-hero__icon"></i>
+            <div class="flex items-center flex-wrap gap-x-4" style="gap:10px;">
+                <a asp-controller="ListeningQuestions" asp-action="StartQuiz" class="btn btn-primary">
+                    <i class="bi bi-play-fill"></i> Start practice
+                </a>
+                @if (User?.IsInRole("Admin") == true)
+                {
+                    <a asp-controller="Home" asp-action="Dashboard" class="btn btn-ghost">
+                        <i class="bi bi-graph-up-arrow"></i> Dashboard
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="stats-cards-grid" role="list" aria-label="Library summary">
+            <div class="stat-number-card stat-number-card--violet" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-collection-fill"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@Model.TotalQuestionsCount</span>
+                    <span class="stat-number-card__label">Total questions</span>
+                </div>
+                <span class="stat-number-card__meta">Library</span>
+            </div>
+            <div class="stat-number-card stat-number-card--blue" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-stack"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@totalForms</span>
+                    <span class="stat-number-card__label">Available forms</span>
+                </div>
+                <span class="stat-number-card__meta">Listening<br />Reading</span>
+            </div>
+            <div class="stat-number-card stat-number-card--emerald" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-tags-fill"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@totalTopics</span>
+                    <span class="stat-number-card__label">Grammar topics</span>
+                </div>
+                <span class="stat-number-card__meta">Grammar</span>
+            </div>
+            <div class="stat-number-card stat-number-card--amber" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-lightning-charge-fill"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@Model.ListeningFormsCount</span>
+                    <span class="stat-number-card__label">Listening forms</span>
+                </div>
+                <span class="stat-number-card__meta">Quick start</span>
             </div>
         </div>
     </section>
 
-    @* ──────────────────────────────────────────────────────────────────
-       Practice modes — the primary CTA grid (3 hero cards).
-       ────────────────────────────────────────────────────────────────── *@
-    <section class="dash-section" aria-labelledby="practice-heading">
+    <section class="dash-section" aria-labelledby="nav-heading">
         <header class="dash-section-head">
-            <h2 id="practice-heading">Pick a practice mode</h2>
-            <p>Three skill tracks that mirror real exam structure. Jump in and start improving.</p>
+            <h2 id="nav-heading">Pick a practice mode</h2>
+            <p>Each mode takes you directly to the quiz start page.</p>
         </header>
 
         <div class="practice-mode-grid">
@@ -80,24 +81,15 @@
                     <span class="practice-mode__icon" aria-hidden="true"><i class="bi bi-headphones"></i></span>
                     <div>
                         <div class="practice-mode__title">Listening</div>
-                        <div class="practice-mode__sub">Audio comprehension</div>
+                        <div class="practice-mode__sub">
+                            @Model.ListeningFormsCount forms<br />
+                            @Model.ListeningQuestionsCount questions
+                        </div>
                     </div>
                 </div>
-                <p class="practice-mode__desc">
-                    Train with real exam-style clips. Pick a form, focus your ear, and build speed under realistic time pressure.
-                </p>
-                <div class="practice-mode__metrics">
-                    <div class="practice-mode__metric">
-                        <span class="practice-mode__metric-value">@Model.ListeningQuestionsCount</span>
-                        <span class="practice-mode__metric-label">Questions</span>
-                    </div>
-                    <div class="practice-mode__metric">
-                        <span class="practice-mode__metric-value">@Model.ListeningFormsCount</span>
-                        <span class="practice-mode__metric-label">Forms</span>
-                    </div>
-                </div>
+                <p class="practice-mode__desc">Audio comprehension with exam-style questions and quick feedback.</p>
                 <span class="practice-mode__cta">
-                    <span>Start listening quiz</span>
+                    <span>Start</span>
                     <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </span>
             </a>
@@ -107,24 +99,15 @@
                     <span class="practice-mode__icon" aria-hidden="true"><i class="bi bi-book-half"></i></span>
                     <div>
                         <div class="practice-mode__title">Reading</div>
-                        <div class="practice-mode__sub">Passages &amp; comprehension</div>
+                        <div class="practice-mode__sub">
+                            @Model.ReadingFormsCount forms<br />
+                            @Model.ReadingQuestionsCount questions
+                        </div>
                     </div>
                 </div>
-                <p class="practice-mode__desc">
-                    Work through passages and sharpen inference, detail spotting, and vocabulary in carefully structured sets.
-                </p>
-                <div class="practice-mode__metrics">
-                    <div class="practice-mode__metric">
-                        <span class="practice-mode__metric-value">@Model.ReadingQuestionsCount</span>
-                        <span class="practice-mode__metric-label">Questions</span>
-                    </div>
-                    <div class="practice-mode__metric">
-                        <span class="practice-mode__metric-value">@Model.ReadingFormsCount</span>
-                        <span class="practice-mode__metric-label">Forms</span>
-                    </div>
-                </div>
+                <p class="practice-mode__desc">Passages and comprehension sets for detail and inference.</p>
                 <span class="practice-mode__cta">
-                    <span>Start reading quiz</span>
+                    <span>Start</span>
                     <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </span>
             </a>
@@ -134,129 +117,18 @@
                     <span class="practice-mode__icon" aria-hidden="true"><i class="bi bi-spellcheck"></i></span>
                     <div>
                         <div class="practice-mode__title">Grammar</div>
-                        <div class="practice-mode__sub">Targeted topic drills</div>
+                        <div class="practice-mode__sub">
+                            @Model.GrammarTopicsCount topics<br />
+                            @Model.GrammarQuestionsCount questions
+                        </div>
                     </div>
                 </div>
-                <p class="practice-mode__desc">
-                    Drill specific structures — inversion, conditionals, modals — at beginner, intermediate, or advanced difficulty.
-                </p>
-                <div class="practice-mode__metrics">
-                    <div class="practice-mode__metric">
-                        <span class="practice-mode__metric-value">@Model.GrammarQuestionsCount</span>
-                        <span class="practice-mode__metric-label">Questions</span>
-                    </div>
-                    <div class="practice-mode__metric">
-                        <span class="practice-mode__metric-value">@Model.GrammarTopicsCount</span>
-                        <span class="practice-mode__metric-label">Topics</span>
-                    </div>
-                </div>
+                <p class="practice-mode__desc">Topic drills across levels (Beginner → Advanced) with explanations.</p>
                 <span class="practice-mode__cta">
-                    <span>Start grammar quiz</span>
+                    <span>Start</span>
                     <i class="bi bi-arrow-right" aria-hidden="true"></i>
                 </span>
             </a>
         </div>
     </section>
-
-    @* ──────────────────────────────────────────────────────────────────
-       Library at a glance — slim 4-up stats band.
-       ────────────────────────────────────────────────────────────────── *@
-    <section class="dash-section" aria-labelledby="library-heading">
-        <header class="dash-section-head">
-            <h2 id="library-heading">Your library at a glance</h2>
-            <p>Everything that's currently available to practice.</p>
-        </header>
-
-        <div class="lib-stats-grid">
-            <div class="lib-stat">
-                <span class="lib-stat__icon lib-stat__icon--violet" aria-hidden="true">
-                    <i class="bi bi-collection-fill"></i>
-                </span>
-                <div class="lib-stat__body">
-                    <span class="lib-stat__num">@Model.TotalQuestionsCount</span>
-                    <span class="lib-stat__label">Total questions</span>
-                    <span class="lib-stat__hint">L @Model.ListeningQuestionsCount · R @Model.ReadingQuestionsCount · G @Model.GrammarQuestionsCount</span>
-                </div>
-            </div>
-
-            <div class="lib-stat">
-                <span class="lib-stat__icon lib-stat__icon--blue" aria-hidden="true">
-                    <i class="bi bi-stack"></i>
-                </span>
-                <div class="lib-stat__body">
-                    <span class="lib-stat__num">@Model.ListeningFormsCount</span>
-                    <span class="lib-stat__label">Listening forms</span>
-                    <span class="lib-stat__hint">@Model.ListeningQuestionsCount questions across forms</span>
-                </div>
-            </div>
-
-            <div class="lib-stat">
-                <span class="lib-stat__icon lib-stat__icon--em" aria-hidden="true">
-                    <i class="bi bi-stack"></i>
-                </span>
-                <div class="lib-stat__body">
-                    <span class="lib-stat__num">@Model.ReadingFormsCount</span>
-                    <span class="lib-stat__label">Reading forms</span>
-                    <span class="lib-stat__hint">@Model.ReadingQuestionsCount questions across forms</span>
-                </div>
-            </div>
-
-            <div class="lib-stat">
-                <span class="lib-stat__icon lib-stat__icon--mag" aria-hidden="true">
-                    <i class="bi bi-tags-fill"></i>
-                </span>
-                <div class="lib-stat__body">
-                    <span class="lib-stat__num">@Model.GrammarTopicsCount</span>
-                    <span class="lib-stat__label">Grammar topics</span>
-                    <span class="lib-stat__hint">B @Model.GrammarLevelBeginnerCount · I @Model.GrammarLevelIntermediateCount · A @Model.GrammarLevelAdvancedCount</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    @* ──────────────────────────────────────────────────────────────────
-       Admin tools — only shown to administrators.
-       ────────────────────────────────────────────────────────────────── *@
-    @if (isAdmin)
-    {
-        <section class="dash-section" aria-labelledby="admin-heading">
-            <header class="dash-section-head">
-                <h2 id="admin-heading">Admin tools</h2>
-                <p>Manage question banks and content.</p>
-            </header>
-
-            <div class="admin-tools-grid">
-                <a asp-controller="ListeningQuestions" asp-action="Index" class="admin-tile">
-                    <span class="admin-tile__icon admin-tile__icon--blue" aria-hidden="true">
-                        <i class="bi bi-headphones"></i>
-                    </span>
-                    <div>
-                        <span class="admin-tile__label">Manage</span>
-                        <span class="admin-tile__name">Listening bank</span>
-                    </div>
-                    <i class="bi bi-arrow-right admin-tile__arrow" aria-hidden="true"></i>
-                </a>
-                <a asp-controller="ReadingQuestions" asp-action="Index" class="admin-tile">
-                    <span class="admin-tile__icon admin-tile__icon--em" aria-hidden="true">
-                        <i class="bi bi-journal-text"></i>
-                    </span>
-                    <div>
-                        <span class="admin-tile__label">Manage</span>
-                        <span class="admin-tile__name">Reading bank</span>
-                    </div>
-                    <i class="bi bi-arrow-right admin-tile__arrow" aria-hidden="true"></i>
-                </a>
-                <a asp-controller="GrammarQuestions" asp-action="Index" class="admin-tile">
-                    <span class="admin-tile__icon admin-tile__icon--mag" aria-hidden="true">
-                        <i class="bi bi-spellcheck"></i>
-                    </span>
-                    <div>
-                        <span class="admin-tile__label">Manage</span>
-                        <span class="admin-tile__name">Grammar bank</span>
-                    </div>
-                    <i class="bi bi-arrow-right admin-tile__arrow" aria-hidden="true"></i>
-                </a>
-            </div>
-        </section>
-    }
 </div>

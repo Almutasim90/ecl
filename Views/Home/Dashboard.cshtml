@@ -1,0 +1,259 @@
+@model ECL.Models.DashboardPageViewModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Dashboard";
+    var isAdmin = ViewBag.IsAdmin as bool? ?? false;
+    var totalForms = Model.TotalListeningReadingFormsCount;
+    var totalTopics = Model.GrammarTopicsCount;
+
+    var jsonOpts = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+}
+
+@if (ViewData["DashboardWarning"] is string msg)
+{
+    <div class="alert-warning" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> @msg
+        <a asp-controller="Home" asp-action="DatabaseUnavailable">Details</a>
+    </div>
+}
+
+<div class="dash-page">
+
+    <section aria-label="Dashboard header">
+        <div class="section-header">
+            <div class="section-header-text">
+                <h1 class="section-title">Dashboard</h1>
+                <div class="section-subtitle">A clear overview of your question bank: totals, distribution, and topic coverage.</div>
+            </div>
+            <div class="flex items-center flex-wrap" style="gap:10px;">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-ghost">
+                    <i class="bi bi-house-door"></i> Home
+                </a>
+                <a asp-controller="ListeningQuestions" asp-action="StartQuiz" class="btn btn-primary">
+                    <i class="bi bi-play-fill"></i> Start practice
+                </a>
+            </div>
+        </div>
+
+        <div class="stats-cards-grid" role="list" aria-label="Key statistics">
+            <div class="stat-number-card stat-number-card--violet" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-collection-fill"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@Model.TotalQuestionsCount</span>
+                    <span class="stat-number-card__label">Total questions</span>
+                </div>
+                <span class="stat-number-card__meta">All modes</span>
+            </div>
+            <div class="stat-number-card stat-number-card--blue" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-headphones"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@Model.ListeningQuestionsCount</span>
+                    <span class="stat-number-card__label">Listening</span>
+                </div>
+                <span class="stat-number-card__meta">@Model.ListeningFormsCount forms</span>
+            </div>
+            <div class="stat-number-card stat-number-card--emerald" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-book-half"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@Model.ReadingQuestionsCount</span>
+                    <span class="stat-number-card__label">Reading</span>
+                </div>
+                <span class="stat-number-card__meta">@Model.ReadingFormsCount forms</span>
+            </div>
+            <div class="stat-number-card stat-number-card--amber" role="listitem">
+                <span class="stat-number-card__icon" aria-hidden="true"><i class="bi bi-spellcheck"></i></span>
+                <div class="stat-number-card__content">
+                    <span class="stat-number-card__value">@Model.GrammarQuestionsCount</span>
+                    <span class="stat-number-card__label">Grammar</span>
+                </div>
+                <span class="stat-number-card__meta">@Model.GrammarTopicsCount topics</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="dash-section" aria-labelledby="charts-heading">
+        <header class="dash-section-head">
+            <h2 id="charts-heading">Charts</h2>
+            <p>Distribution by form and grammar coverage.</p>
+        </header>
+
+        <div class="dash-charts-grid">
+            <section class="dash-chart-card dash-chart-card--wide" aria-label="Questions per form chart">
+                <div class="dash-chart-head">
+                    <div>
+                        <div class="dash-chart-title"><i class="bi bi-bar-chart-line"></i> Questions per form</div>
+                        <div class="dash-chart-sub">Listening vs Reading</div>
+                    </div>
+                    <div class="dash-chart-meta"><i class="bi bi-info-circle"></i> Distribution</div>
+                </div>
+                <div class="dash-chart-body">
+                    <canvas id="formsChart" class="dash-chart-canvas dash-chart-canvas--short"></canvas>
+                </div>
+            </section>
+
+            <section class="dash-chart-card dash-chart-card--half" aria-label="Grammar levels chart">
+                <div class="dash-chart-head">
+                    <div>
+                        <div class="dash-chart-title"><i class="bi bi-pie-chart"></i> Grammar levels</div>
+                        <div class="dash-chart-sub">Beginner · Intermediate · Advanced</div>
+                    </div>
+                </div>
+                <div class="dash-chart-body">
+                    <canvas id="levelsChart" class="dash-chart-canvas"></canvas>
+                </div>
+            </section>
+
+            <section class="dash-chart-card dash-chart-card--half" aria-label="Top grammar topics chart">
+                <div class="dash-chart-head">
+                    <div>
+                        <div class="dash-chart-title"><i class="bi bi-tags"></i> Top grammar topics</div>
+                        <div class="dash-chart-sub">Most populated topics</div>
+                    </div>
+                </div>
+                <div class="dash-chart-body">
+                    <canvas id="topicsChart" class="dash-chart-canvas"></canvas>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    @if (isAdmin)
+    {
+        <section class="dash-section" aria-labelledby="admin-heading">
+            <header class="dash-section-head">
+                <h2 id="admin-heading">Admin tools</h2>
+                <p>Manage question banks and content.</p>
+            </header>
+
+            <div class="admin-tools-grid">
+                <a asp-controller="ListeningQuestions" asp-action="Index" class="admin-tile">
+                    <span class="admin-tile__icon admin-tile__icon--blue" aria-hidden="true">
+                        <i class="bi bi-headphones"></i>
+                    </span>
+                    <div>
+                        <span class="admin-tile__label">Manage</span>
+                        <span class="admin-tile__name">Listening bank</span>
+                    </div>
+                    <i class="bi bi-arrow-right admin-tile__arrow" aria-hidden="true"></i>
+                </a>
+                <a asp-controller="ReadingQuestions" asp-action="Index" class="admin-tile">
+                    <span class="admin-tile__icon admin-tile__icon--em" aria-hidden="true">
+                        <i class="bi bi-journal-text"></i>
+                    </span>
+                    <div>
+                        <span class="admin-tile__label">Manage</span>
+                        <span class="admin-tile__name">Reading bank</span>
+                    </div>
+                    <i class="bi bi-arrow-right admin-tile__arrow" aria-hidden="true"></i>
+                </a>
+                <a asp-controller="GrammarQuestions" asp-action="Index" class="admin-tile">
+                    <span class="admin-tile__icon admin-tile__icon--mag" aria-hidden="true">
+                        <i class="bi bi-spellcheck"></i>
+                    </span>
+                    <div>
+                        <span class="admin-tile__label">Manage</span>
+                        <span class="admin-tile__name">Grammar bank</span>
+                    </div>
+                    <i class="bi bi-arrow-right admin-tile__arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        const listeningForms = @Html.Raw(JsonSerializer.Serialize(Model.ListeningFormNumbers, jsonOpts));
+        const listeningCounts = @Html.Raw(JsonSerializer.Serialize(Model.ListeningFormCounts, jsonOpts));
+        const readingForms = @Html.Raw(JsonSerializer.Serialize(Model.ReadingFormNumbers, jsonOpts));
+        const readingCounts = @Html.Raw(JsonSerializer.Serialize(Model.ReadingFormCounts, jsonOpts));
+
+        const levelLabels = @Html.Raw(JsonSerializer.Serialize(Model.GrammarLevelLabels, jsonOpts));
+        const levelCounts = @Html.Raw(JsonSerializer.Serialize(Model.GrammarLevelCounts, jsonOpts));
+
+        const topicLabels = @Html.Raw(JsonSerializer.Serialize(Model.TopGrammarTopicLabels, jsonOpts));
+        const topicCounts = @Html.Raw(JsonSerializer.Serialize(Model.TopGrammarTopicCounts, jsonOpts));
+
+        const formsLabelSet = Array.from(new Set([...(listeningForms || []), ...(readingForms || [])])).sort((a,b) => a-b);
+        const lMap = new Map((listeningForms || []).map((f, i) => [f, listeningCounts?.[i] ?? 0]));
+        const rMap = new Map((readingForms || []).map((f, i) => [f, readingCounts?.[i] ?? 0]));
+        const lSeries = formsLabelSet.map(f => lMap.get(f) ?? 0);
+        const rSeries = formsLabelSet.map(f => rMap.get(f) ?? 0);
+
+        const formsCtx = document.getElementById('formsChart');
+        if (formsCtx) {
+            new Chart(formsCtx, {
+                type: 'bar',
+                data: {
+                    labels: formsLabelSet.map(x => 'Form ' + x),
+                    datasets: [
+                        { label: 'Listening', data: lSeries, backgroundColor: 'rgba(59, 130, 246, 0.75)' },
+                        { label: 'Reading', data: rSeries, backgroundColor: 'rgba(16, 185, 129, 0.75)' },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+
+        const levelsCtx = document.getElementById('levelsChart');
+        if (levelsCtx) {
+            new Chart(levelsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: levelLabels,
+                    datasets: [{
+                        data: levelCounts,
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.85)',
+                            'rgba(244, 63, 94, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        const topicsCtx = document.getElementById('topicsChart');
+        if (topicsCtx) {
+            new Chart(topicsCtx, {
+                type: 'bar',
+                data: {
+                    labels: topicLabels,
+                    datasets: [{
+                        label: 'Questions',
+                        data: topicCounts,
+                        backgroundColor: 'rgba(139, 92, 246, 0.75)'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    </script>
+}
+
