@@ -29,11 +29,19 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish ./
-# Configure both HTTP (8081) and HTTPS (8082)
+
+# Runtime (non-secret). Secrets must come from your host (e.g. Coolify → Environment Variables).
 ENV ASPNETCORE_URLS=http://+:8081
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-# Expose both ports
+# ── Required when deploying from this Dockerfile only (no docker-compose) ──
+# Published appsettings use an empty DB connection. Set in Coolify / your orchestrator:
+#   DATABASE_URL=postgresql://...  OR  ConnectionStrings__DefaultConnection=Host=...;...
+# Optional admin login:
+#   AdminCredentials__Username  /  AdminCredentials__Password
+# Optional CORS:
+#   WEB_ORIGIN=https://your-public-site
+
 EXPOSE 8081
 
 ENTRYPOINT ["dotnet", "ECL.dll"]
