@@ -119,12 +119,24 @@ if (!string.IsNullOrWhiteSpace(databaseUrl))
 
         var port = uri.IsDefaultPort ? 5432 : uri.Port;
         connectionString = $"Host={uri.Host};Port={port};Database={db};Username={user};Password={pass}";
+
+        // e.g. ?sslmode=require from managed Postgres / Supabase connection strings
+        var query = uri.Query.TrimStart('?');
+        if (query.Contains("sslmode=require", StringComparison.OrdinalIgnoreCase) ||
+            query.Contains("sslmode=verify-full", StringComparison.OrdinalIgnoreCase) ||
+            query.Contains("sslmode=verify-ca", StringComparison.OrdinalIgnoreCase))
+        {
+            connectionString += ";SSL Mode=Require;Trust Server Certificate=true";
+        }
     }
 }
 
 if (string.IsNullOrWhiteSpace(connectionString))
     throw new InvalidOperationException(
-        "Database connection is not configured. Set ConnectionStrings:DefaultConnection in appsettings.json.");
+        "Database connection is not configured. Set DATABASE_URL or ConnectionStrings__DefaultConnection " +
+        "(Coolify / Docker: add these in the service environment). " +
+        "Inside Docker, Host=localhost targets the app container only; use your Postgres hostname, host.docker.internal " +
+        "(if Postgres is on the VPS host), or another service name on the same Docker network.");
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(o => o

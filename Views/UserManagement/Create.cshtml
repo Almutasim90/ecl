@@ -1,0 +1,59 @@
+@model ECL.Models.AdminCreateStudentViewModel
+@{
+    ViewData["Title"] = "Add student";
+}
+
+<div class="section-header">
+    <div class="section-header-text">
+        <h1 class="section-title">Add student account</h1>
+        <p class="section-subtitle">Creates credentials with the Student role (same as self-registration).</p>
+    </div>
+    <a asp-action="Index" class="btn btn-ghost">
+        <i class="bi bi-arrow-left"></i> Back to list
+    </a>
+</div>
+
+<div class="auth-wrap" style="padding-top:0;">
+    <div class="auth-card" style="max-width:440px;">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert-error">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form asp-action="Create" method="post" autocomplete="off" class="auth-form">
+            @Html.AntiForgeryToken()
+
+            <div class="field-group">
+                <label asp-for="Username" class="field-label"></label>
+                <input asp-for="Username" class="field-input auth-input" inputmode="text" autocomplete="username" />
+                <span asp-validation-for="Username" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="Password" class="field-label"></label>
+                <input asp-for="Password" class="field-input auth-input" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+
+            <div class="field-group">
+                <label asp-for="ConfirmPassword" class="field-label"></label>
+                <input asp-for="ConfirmPassword" class="field-input auth-input" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                <i class="bi bi-check2-circle"></i>
+                <span>Create account</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

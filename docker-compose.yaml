@@ -2,6 +2,9 @@ services:
   app:
     image: "${SERVICE_IMAGE}"
     restart: unless-stopped
+    # Reach PostgreSQL running on the Docker host (not "localhost" inside the container).
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       # Mount 600+ WAV files from host — excluded from Docker image
       - /opt/ecl/audio_files:/app/wwwroot/AUDIO:ro
@@ -9,6 +12,12 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:8081
       - ASPNETCORE_ENVIRONMENT=Production
       - WEB_ORIGIN=http://ecl.almutasim.site
+      # Required in production containers: appsettings "localhost" is the container itself.
+      # Set in Coolify (or .env): use your real Postgres host, or host.docker.internal if DB is on the VPS host.
+      - DATABASE_URL=${DATABASE_URL:-}
+      - ConnectionStrings__DefaultConnection=${ConnectionStrings__DefaultConnection:-}
+      - AdminCredentials__Username=${AdminCredentials__Username:-}
+      - AdminCredentials__Password=${AdminCredentials__Password:-}
     networks:
       - coolify
 
