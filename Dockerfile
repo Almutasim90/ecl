@@ -34,8 +34,8 @@ COPY --from=build /app/publish ./
 ENV ASPNETCORE_URLS=http://+:8081
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-# ── Required when deploying from this Dockerfile only (no docker-compose) ──
-# Published appsettings use an empty DB connection. Set in Coolify / your orchestrator:
+# ── Coolify often builds this Dockerfile but starts via docker-compose.yaml ──
+# If ConnectionStrings:DefaultConnection is empty in appsettings, set in Coolify:
 #   DATABASE_URL=postgresql://...  OR  ConnectionStrings__DefaultConnection=Host=...;...
 # Optional admin login:
 #   AdminCredentials__Username  /  AdminCredentials__Password
