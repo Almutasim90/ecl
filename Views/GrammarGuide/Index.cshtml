@@ -1,0 +1,1008 @@
+@model GrammarGuidePageViewModel
+@{
+    var tocTimeOrder = new[] { "present", "past", "future" };
+    var tocTimeLabels = new Dictionary<string, string>
+    {
+        ["present"] = "Present",
+        ["past"] = "Past",
+        ["future"] = "Future",
+    };
+}
+
+<link rel="stylesheet" href="~/css/grammar-guide.css" asp-append-version="true" />
+
+<article id="@GrammarGuideCatalog.PageTopAnchor" class="grammar-guide-article">
+    <a class="grammar-skip-link" href="#grammar-toc">Skip to page index</a>
+
+    <div class="grammar-page-layout">
+        <div class="grammar-page grammar-page--main">
+
+    @* ════════════════════════════════════════════════════════════ HERO *@
+    <header class="grammar-hero" aria-label="Grammar guide introduction">
+        <div class="grammar-hero__content">
+            <span class="grammar-hero__eyebrow">
+                <i class="bi bi-book"></i> Grammar Reference
+            </span>
+            <h1 class="grammar-hero__title">English <em>Tenses</em></h1>
+            <p class="grammar-hero__lede">
+                A complete visual guide to all <strong>12 English tenses</strong>.
+                Learn the structure, when to use each tense, and see real examples —
+                from <strong>Simple Present</strong> to <strong>Future Perfect Continuous</strong>.
+            </p>
+            <div class="grammar-hero__stats">
+                <span class="grammar-hero__stat">
+                    <i class="bi bi-3-square"></i>
+                    <strong>3</strong> Time Frames
+                </span>
+                <span class="grammar-hero__stat">
+                    <i class="bi bi-4-square"></i>
+                    <strong>4</strong> Aspects Each
+                </span>
+                <span class="grammar-hero__stat">
+                    <i class="bi bi-123"></i>
+                    <strong>12</strong> Tenses Total
+                </span>
+            </div>
+        </div>
+    </header>
+
+    @* ════════════════════════════════════════════════════════════ QUICK TEST *@
+    <section class="quick-test" id="grammar-quick-test" aria-label="Quick knowledge test">
+        <div class="quick-test__header">
+            <div class="quick-test__icon"><i class="bi bi-question-lg"></i></div>
+            <div class="quick-test__title-area">
+                <h3>Quick Test</h3>
+                <p>Try these 3 questions before we dive in — see how many you get right!</p>
+            </div>
+        </div>
+
+        <div class="quick-test__questions" id="quickTestQuestions">
+            @* Question 1 *@
+            <div class="quick-test__q" data-q="0">
+                <div class="quick-test__q-text">
+                    She <span class="blank">__________</span> English every day.
+                </div>
+                <div class="quick-test__options">
+                    <button class="quick-test__opt" data-answer="0">study</button>
+                    <button class="quick-test__opt" data-answer="1">studies</button>
+                    <button class="quick-test__opt" data-answer="2">studying</button>
+                    <button class="quick-test__opt" data-answer="3">studied</button>
+                </div>
+                <div class="quick-test__feedback" data-correct="1">
+                    <strong>Present Simple</strong> — with <em>he / she / it</em>, add <strong>-s</strong> or <strong>-es</strong> to the verb. Signal word: <em>every day</em>.
+                </div>
+            </div>
+
+            @* Question 2 *@
+            <div class="quick-test__q" data-q="1">
+                <div class="quick-test__q-text">
+                    They <span class="blank">__________</span> dinner when I arrived.
+                </div>
+                <div class="quick-test__options">
+                    <button class="quick-test__opt" data-answer="0">have</button>
+                    <button class="quick-test__opt" data-answer="1">are having</button>
+                    <button class="quick-test__opt" data-answer="2">were having</button>
+                    <button class="quick-test__opt" data-answer="3">had</button>
+                </div>
+                <div class="quick-test__feedback" data-correct="2">
+                    <strong>Past Continuous</strong> — an ongoing action (<em>were having dinner</em>) interrupted by another action (<em>arrived</em>).
+                </div>
+            </div>
+
+            @* Question 3 *@
+            <div class="quick-test__q" data-q="2">
+                <div class="quick-test__q-text">
+                    By next year, I <span class="blank">__________</span> here for 10 years.
+                </div>
+                <div class="quick-test__options">
+                    <button class="quick-test__opt" data-answer="0">work</button>
+                    <button class="quick-test__opt" data-answer="1">will work</button>
+                    <button class="quick-test__opt" data-answer="2">will have worked</button>
+                    <button class="quick-test__opt" data-answer="3">am working</button>
+                </div>
+                <div class="quick-test__feedback" data-correct="2">
+                    <strong>Future Perfect</strong> — an action that will be completed before a future time. Signal: <em>By next year</em> + <em>for 10 years</em>.
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-test__score">
+            <i class="bi bi-trophy"></i>
+            Your Score:
+            <span class="quick-test__score-value" id="testScore">0</span>
+            <span style="color: var(--t3); font-weight: 600;">/ 3</span>
+            <span id="testMessage" style="margin-left:auto; font-size:.82rem; font-weight:600;"></span>
+        </div>
+    </section>
+
+    @* ════════════════════════════════════════════════════════════ TENSE OVERVIEW *@
+    <section id="grammar-tenses-overview" aria-label="Tense overview">
+
+        <div class="grammar-section-head" style="margin-bottom:16px;">
+            <h2>Tenses at a Glance</h2>
+            <p>Tap each time frame to explore its four tenses. Watch the cards appear as you scroll.</p>
+        </div>
+
+        @* Tabs *@
+        <div class="tense-tabs" role="tablist">
+            <button class="tense-tab active" data-time="present" role="tab" aria-selected="true">Present</button>
+            <button class="tense-tab" data-time="past" role="tab" aria-selected="false">Past</button>
+            <button class="tense-tab" data-time="future" role="tab" aria-selected="false">Future</button>
+        </div>
+
+        <div class="tense-panels">
+
+            @* ─── PRESENT PANEL ──────────────────────────────────────────── *@
+            <div class="tense-panel active" data-time="present" role="tabpanel">
+                <div class="tense-grid">
+
+                    @* Present Simple *@
+                    <div class="tense-card tense-card--present" id="tense-present-simple">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-circle-fill"></i></div>
+                            <div>
+                                <div class="tense-card__name">Present Simple</div>
+                                <div class="tense-card__aspect">Simple Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">V1</span> (s/es) + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Facts, habits, routines, schedules, and general truths.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                <span class="verb">She reads</span> books every day.
+                                <span class="tense-card__ex-translation">Habit — a regular action.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                Water <span class="verb">boils</span> at 100&deg;C.
+                                <span class="tense-card__ex-translation">Scientific fact — always true.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                The train <span class="verb">leaves</span> at 6 PM.
+                                <span class="tense-card__ex-translation">Scheduled event in the near future.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">always</span>
+                            <span class="tense-card__signal">usually</span>
+                            <span class="tense-card__signal">often</span>
+                            <span class="tense-card__signal">sometimes</span>
+                            <span class="tense-card__signal">never</span>
+                            <span class="tense-card__signal">every day</span>
+                            <span class="tense-card__signal">on Mondays</span>
+                        </div>
+                    </div>
+
+                    @* Present Continuous *@
+                    <div class="tense-card tense-card--present" id="tense-present-continuous">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-arrow-repeat"></i></div>
+                            <div>
+                                <div class="tense-card__name">Present Continuous</div>
+                                <div class="tense-card__aspect">Continuous Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">am / is / are</span> + <span class="highlight">V-ing</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Actions happening right now, temporary situations, and fixed future arrangements.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">is reading</span> a book right now.
+                                <span class="tense-card__ex-translation">In progress at this moment.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">am staying</span> with my cousin this week.
+                                <span class="tense-card__ex-translation">Temporary situation.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                We <span class="verb">are meeting</span> John tomorrow.
+                                <span class="tense-card__ex-translation">A fixed arrangement in the future.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">now</span>
+                            <span class="tense-card__signal">right now</span>
+                            <span class="tense-card__signal">at the moment</span>
+                            <span class="tense-card__signal">today</span>
+                            <span class="tense-card__signal">this week</span>
+                            <span class="tense-card__signal">Look!</span>
+                            <span class="tense-card__signal">Listen!</span>
+                        </div>
+                    </div>
+
+                    @* Present Perfect *@
+                    <div class="tense-card tense-card--present" id="tense-present-perfect">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-check-circle-fill"></i></div>
+                            <div>
+                                <div class="tense-card__name">Present Perfect</div>
+                                <div class="tense-card__aspect">Perfect Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">have / has</span> + <span class="highlight">V3</span> (past participle) + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Past actions with present relevance, life experiences, and unfinished actions.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">has read</span> that book.
+                                <span class="tense-card__ex-translation">Experience — we don't say when.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">have lived</span> here for 5 years.
+                                <span class="tense-card__ex-translation">Unfinished — still living here.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">have just arrived</span>.
+                                <span class="tense-card__ex-translation">Recent past — result is important now.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">ever</span>
+                            <span class="tense-card__signal">never</span>
+                            <span class="tense-card__signal">just</span>
+                            <span class="tense-card__signal">already</span>
+                            <span class="tense-card__signal">yet</span>
+                            <span class="tense-card__signal">since</span>
+                            <span class="tense-card__signal">for</span>
+                            <span class="tense-card__signal">so far</span>
+                        </div>
+                    </div>
+
+                    @* Present Perfect Continuous *@
+                    <div class="tense-card tense-card--present" id="tense-present-perfect-continuous">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <div class="tense-card__name">Present Perfect Continuous</div>
+                                <div class="tense-card__aspect">Perfect Continuous Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">have / has</span> + <span class="highlight">been</span> + <span class="highlight">V-ing</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Actions that started in the past and continue to the present, with focus on duration.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">has been reading</span> for 3 hours.
+                                <span class="tense-card__ex-translation">Emphasises the duration of a continuous action.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                It <span class="verb">has been raining</span> all day.
+                                <span class="tense-card__ex-translation">Ongoing with a visible result (wet ground).</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">have been working</span> here since 2020.
+                                <span class="tense-card__ex-translation">Started in the past and continues now.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">for</span>
+                            <span class="tense-card__signal">since</span>
+                            <span class="tense-card__signal">all day</span>
+                            <span class="tense-card__signal">recently</span>
+                            <span class="tense-card__signal">lately</span>
+                            <span class="tense-card__signal">how long</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @* ─── PAST PANEL ─────────────────────────────────────────────── *@
+            <div class="tense-panel" data-time="past" role="tabpanel">
+                <div class="tense-grid">
+
+                    @* Past Simple *@
+                    <div class="tense-card tense-card--past" id="tense-past-simple">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-circle-fill"></i></div>
+                            <div>
+                                <div class="tense-card__name">Past Simple</div>
+                                <div class="tense-card__aspect">Simple Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">V2</span> (past form) + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Completed actions in the past, past habits, and past states.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">read</span> a book yesterday.
+                                <span class="tense-card__ex-translation">Completed action at a specific past time.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">lived</span> in London in 2010.
+                                <span class="tense-card__ex-translation">Past state — no longer true.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">walked</span> to school every day.
+                                <span class="tense-card__ex-translation">Past habit — no longer happens.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">yesterday</span>
+                            <span class="tense-card__signal">last week</span>
+                            <span class="tense-card__signal">in 2010</span>
+                            <span class="tense-card__signal">ago</span>
+                            <span class="tense-card__signal">then</span>
+                            <span class="tense-card__signal">when</span>
+                        </div>
+                    </div>
+
+                    @* Past Continuous *@
+                    <div class="tense-card tense-card--past" id="tense-past-continuous">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-arrow-repeat"></i></div>
+                            <div>
+                                <div class="tense-card__name">Past Continuous</div>
+                                <div class="tense-card__aspect">Continuous Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">was / were</span> + <span class="highlight">V-ing</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Actions in progress at a specific past time, interrupted actions, and parallel actions.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">was reading</span> when I called.
+                                <span class="tense-card__ex-translation">Interrupted by another action.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">were playing</span> football at 5 PM.
+                                <span class="tense-card__ex-translation">In progress at a specific time.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                While I <span class="verb">was cooking</span>, he <span class="verb">was watching</span> TV.
+                                <span class="tense-card__ex-translation">Two parallel actions in progress.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">while</span>
+                            <span class="tense-card__signal">when</span>
+                            <span class="tense-card__signal">as</span>
+                            <span class="tense-card__signal">at 5 PM yesterday</span>
+                            <span class="tense-card__signal">at that time</span>
+                        </div>
+                    </div>
+
+                    @* Past Perfect *@
+                    <div class="tense-card tense-card--past" id="tense-past-perfect">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-check-circle-fill"></i></div>
+                            <div>
+                                <div class="tense-card__name">Past Perfect</div>
+                                <div class="tense-card__aspect">Perfect Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">had</span> + <span class="highlight">V3</span> (past participle) + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> An action that was completed before another action in the past ("the past of the past").
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">had already left</span> when I arrived.
+                                <span class="tense-card__ex-translation">Action 1 (leave) happened before Action 2 (arrive).</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">had finished</span> my homework before dinner.
+                                <span class="tense-card__ex-translation">Completed before another past event.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">had never seen</span> snow before.
+                                <span class="tense-card__ex-translation">Experience before a point in the past.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">already</span>
+                            <span class="tense-card__signal">just</span>
+                            <span class="tense-card__signal">never</span>
+                            <span class="tense-card__signal">before</span>
+                            <span class="tense-card__signal">by the time</span>
+                            <span class="tense-card__signal">after</span>
+                        </div>
+                    </div>
+
+                    @* Past Perfect Continuous *@
+                    <div class="tense-card tense-card--past" id="tense-past-perfect-continuous">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <div class="tense-card__name">Past Perfect Continuous</div>
+                                <div class="tense-card__aspect">Perfect Continuous Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">had</span> + <span class="highlight">been</span> + <span class="highlight">V-ing</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> A continuous action that was in progress before another action in the past.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">had been reading</span> for 2 hours before I arrived.
+                                <span class="tense-card__ex-translation">Duration of a continuous action before another past event.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">had been traveling</span> for days.
+                                <span class="tense-card__ex-translation">Ongoing action up to a past moment.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">had been waiting</span> for 30 minutes when the bus finally came.
+                                <span class="tense-card__ex-translation">Emphasis on the duration before a past event.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">for</span>
+                            <span class="tense-card__signal">since</span>
+                            <span class="tense-card__signal">before</span>
+                            <span class="tense-card__signal">by the time</span>
+                            <span class="tense-card__signal">how long</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            @* ─── FUTURE PANEL ───────────────────────────────────────────── *@
+            <div class="tense-panel" data-time="future" role="tabpanel">
+                <div class="tense-grid">
+
+                    @* Future Simple *@
+                    <div class="tense-card tense-card--future" id="tense-future-simple">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-circle-fill"></i></div>
+                            <div>
+                                <div class="tense-card__name">Future Simple</div>
+                                <div class="tense-card__aspect">Simple Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">will</span> + <span class="highlight">V1</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Predictions, promises, spontaneous decisions, and future facts.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">will read</span> that book.
+                                <span class="tense-card__ex-translation">Prediction or intention.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                I <span class="verb">will help</span> you tomorrow.
+                                <span class="tense-card__ex-translation">Promise / offer.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                The sun <span class="verb">will rise</span> at 6:30 AM.
+                                <span class="tense-card__ex-translation">Future fact — certain.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">tomorrow</span>
+                            <span class="tense-card__signal">next week</span>
+                            <span class="tense-card__signal">soon</span>
+                            <span class="tense-card__signal">in the future</span>
+                            <span class="tense-card__signal">probably</span>
+                            <span class="tense-card__signal">definitely</span>
+                        </div>
+                    </div>
+
+                    @* Future Continuous *@
+                    <div class="tense-card tense-card--future" id="tense-future-continuous">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-arrow-repeat"></i></div>
+                            <div>
+                                <div class="tense-card__name">Future Continuous</div>
+                                <div class="tense-card__aspect">Continuous Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">will</span> + <span class="highlight">be</span> + <span class="highlight">V-ing</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> Actions that will be in progress at a specific future time.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">will be reading</span> at 8 PM.
+                                <span class="tense-card__ex-translation">In progress at a specific future moment.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                This time next week, I <span class="verb">will be flying</span> to Paris.
+                                <span class="tense-card__ex-translation">Imagining a scene in the future.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                Don't call at 6 — we <span class="verb">will be having</span> dinner.
+                                <span class="tense-card__ex-translation">An action that will be ongoing.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">at this time tomorrow</span>
+                            <span class="tense-card__signal">at 8 PM</span>
+                            <span class="tense-card__signal">all day tomorrow</span>
+                            <span class="tense-card__signal">while</span>
+                        </div>
+                    </div>
+
+                    @* Future Perfect *@
+                    <div class="tense-card tense-card--future" id="tense-future-perfect">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-check-circle-fill"></i></div>
+                            <div>
+                                <div class="tense-card__name">Future Perfect</div>
+                                <div class="tense-card__aspect">Perfect Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">will</span> + <span class="highlight">have</span> + <span class="highlight">V3</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> An action that will be completed before a specific future time.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">will have finished</span> the book by Friday.
+                                <span class="tense-card__ex-translation">Completed before a future deadline.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                By 2027, I <span class="verb">will have graduated</span>.
+                                <span class="tense-card__ex-translation">Goal achieved by a future point.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">will have left</span> before we arrive.
+                                <span class="tense-card__ex-translation">One future action completed before another.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">by</span>
+                            <span class="tense-card__signal">by the time</span>
+                            <span class="tense-card__signal">before</span>
+                            <span class="tense-card__signal">in 3 years</span>
+                            <span class="tense-card__signal">by next month</span>
+                        </div>
+                    </div>
+
+                    @* Future Perfect Continuous *@
+                    <div class="tense-card tense-card--future" id="tense-future-perfect-continuous">
+                        <div class="tense-card__head">
+                            <div class="tense-card__icon"><i class="bi bi-hourglass-split"></i></div>
+                            <div>
+                                <div class="tense-card__name">Future Perfect Continuous</div>
+                                <div class="tense-card__aspect">Perfect Continuous Aspect</div>
+                            </div>
+                        </div>
+                        <div class="tense-card__formula">
+                            Subject + <span class="highlight">will</span> + <span class="highlight">have</span> + <span class="highlight">been</span> + <span class="highlight">V-ing</span> + Object
+                        </div>
+                        <div class="tense-card__usage">
+                            <strong>Use for:</strong> The duration of an action that will be in progress up to a specific future time.
+                        </div>
+                        <div class="tense-card__examples">
+                            <div class="tense-card__ex">
+                                She <span class="verb">will have been reading</span> for 5 hours by noon.
+                                <span class="tense-card__ex-translation">Duration of an action up to a future point.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                By December, I <span class="verb">will have been working</span> here for 2 years.
+                                <span class="tense-card__ex-translation">Emphasis on the length of time.</span>
+                            </div>
+                            <div class="tense-card__ex">
+                                They <span class="verb">will have been traveling</span> for a month by then.
+                                <span class="tense-card__ex-translation">Continuous action with duration up to a future moment.</span>
+                            </div>
+                        </div>
+                        <div class="tense-card__signals">
+                            <span class="tense-card__signal">by</span>
+                            <span class="tense-card__signal">for</span>
+                            <span class="tense-card__signal">by the time</span>
+                            <span class="tense-card__signal">for ... by</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    @* ════════════════════════════════════════════════════════════ TIMELINE *@
+    <section class="timeline-section" id="grammar-timeline" aria-label="Tense timeline">
+        <h2><i class="bi bi-sliders2" style="margin-right:8px;"></i>Tense Timeline</h2>
+        <p style="margin:-16px 0 20px;font-size:.85rem;color:var(--t3);">
+            See where each tense sits on the timeline of time.
+        </p>
+        <div class="timeline-visual">
+            <div class="timeline-track">
+                <span class="timeline-label timeline-label--past">← Past</span>
+                <span class="timeline-label timeline-label--present">Present</span>
+                <span class="timeline-label timeline-label--future">Future →</span>
+
+                @* Past markers *@
+                <div class="timeline-marker" style="left:5%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--past"></div>
+                    <span class="timeline-marker__label">Past Perfect Continuous</span>
+                </div>
+                <div class="timeline-marker" style="left:13%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--past"></div>
+                    <span class="timeline-marker__label">Past Perfect</span>
+                </div>
+                <div class="timeline-marker" style="left:22%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--past"></div>
+                    <span class="timeline-marker__label">Past Continuous</span>
+                </div>
+                <div class="timeline-marker" style="left:31%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--past"></div>
+                    <span class="timeline-marker__label">Past Simple</span>
+                </div>
+
+                @* Present markers *@
+                <div class="timeline-marker" style="left:42%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--present"></div>
+                    <span class="timeline-marker__label">Present Perfect Continuous</span>
+                </div>
+                <div class="timeline-marker" style="left:50%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--present"></div>
+                    <span class="timeline-marker__label">Present Perfect</span>
+                </div>
+                <div class="timeline-marker" style="left:58%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--present"></div>
+                    <span class="timeline-marker__label">Present Continuous</span>
+                </div>
+                <div class="timeline-marker" style="left:66%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--present"></div>
+                    <span class="timeline-marker__label">Present Simple</span>
+                </div>
+
+                @* Future markers *@
+                <div class="timeline-marker" style="left:75%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--future"></div>
+                    <span class="timeline-marker__label">Future Continuous</span>
+                </div>
+                <div class="timeline-marker" style="left:82%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--future"></div>
+                    <span class="timeline-marker__label">Future Simple</span>
+                </div>
+                <div class="timeline-marker" style="left:90%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--future"></div>
+                    <span class="timeline-marker__label">Future Perfect</span>
+                </div>
+                <div class="timeline-marker" style="left:97%;">
+                    <div class="timeline-marker__dot timeline-marker__dot--future"></div>
+                    <span class="timeline-marker__label">Future Perfect Continuous</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* ════════════════════════════════════════════════════════════ SUMMARY TABLE *@
+    <section class="timeline-section" id="grammar-summary-table" aria-label="Tenses summary table">
+        <h2><i class="bi bi-table" style="margin-right:8px;"></i>Full Comparison</h2>
+        <p style="margin:-16px 0 20px;font-size:.85rem;color:var(--t3);">
+            A complete overview of all 12 tenses in one table.
+        </p>
+        <div class="summary-table-wrap">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Tense</th>
+                        <th>Structure</th>
+                        <th>Example</th>
+                        <th>Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="tense-name">Present Simple</td>
+                        <td>V1 (s/es)</td>
+                        <td class="tense-example">She reads books.</td>
+                        <td class="tense-usage">Facts, habits, routines</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Present Continuous</td>
+                        <td>am/is/are + V-ing</td>
+                        <td class="tense-example">She is reading now.</td>
+                        <td class="tense-usage">Ongoing now, temporary, future plans</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Present Perfect</td>
+                        <td>have/has + V3</td>
+                        <td class="tense-example">She has read it.</td>
+                        <td class="tense-usage">Experience, past with present result</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Present Perfect Continuous</td>
+                        <td>have/has + been + V-ing</td>
+                        <td class="tense-example">She has been reading for hours.</td>
+                        <td class="tense-usage">Duration from past to now</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Past Simple</td>
+                        <td>V2 (past form)</td>
+                        <td class="tense-example">She read a book.</td>
+                        <td class="tense-usage">Completed past actions</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Past Continuous</td>
+                        <td>was/were + V-ing</td>
+                        <td class="tense-example">She was reading at 5 PM.</td>
+                        <td class="tense-usage">In progress at past time, interrupted</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Past Perfect</td>
+                        <td>had + V3</td>
+                        <td class="tense-example">She had read it before I arrived.</td>
+                        <td class="tense-usage">Completed before another past action</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Past Perfect Continuous</td>
+                        <td>had + been + V-ing</td>
+                        <td class="tense-example">She had been reading for hours before I came.</td>
+                        <td class="tense-usage">Duration before a past action</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Future Simple</td>
+                        <td>will + V1</td>
+                        <td class="tense-example">She will read it.</td>
+                        <td class="tense-usage">Prediction, promise, spontaneous decision</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Future Continuous</td>
+                        <td>will + be + V-ing</td>
+                        <td class="tense-example">She will be reading at 8 PM.</td>
+                        <td class="tense-usage">In progress at a future time</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Future Perfect</td>
+                        <td>will + have + V3</td>
+                        <td class="tense-example">She will have read it by Friday.</td>
+                        <td class="tense-usage">Completed before a future time</td>
+                    </tr>
+                    <tr>
+                        <td class="tense-name">Future Perfect Continuous</td>
+                        <td>will + have + been + V-ing</td>
+                        <td class="tense-example">She will have been reading for 5 hours by noon.</td>
+                        <td class="tense-usage">Duration up to a future time</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+        </div>
+
+        <aside class="grammar-toc-aside" aria-label="On this page">
+            <nav id="grammar-toc" class="grammar-toc" aria-labelledby="grammar-toc-heading" data-page-top="@GrammarGuideCatalog.PageTopAnchor">
+                <h2 id="grammar-toc-heading" class="grammar-toc__title">
+                    <i class="bi bi-list-nested" aria-hidden="true"></i> On this page
+                </h2>
+                <ol class="grammar-toc__sections">
+                    @foreach (var s in Model.Sections)
+                    {
+                        <li>
+                            <a class="grammar-toc__link" href="#@s.AnchorId" data-toc-section="@s.AnchorId">
+                                @if (!string.IsNullOrEmpty(s.IconClass))
+                                {
+                                    <i class="bi @s.IconClass" aria-hidden="true"></i>
+                                }
+                                <span class="grammar-toc__link-text">@s.Title</span>
+                            </a>
+                            @if (!string.IsNullOrEmpty(s.Summary))
+                            {
+                                <span class="grammar-toc__summary">@s.Summary</span>
+                            }
+                        </li>
+                    }
+                </ol>
+                <div class="grammar-toc__tenses">
+                    <h3 class="grammar-toc__subtitle">Jump to a tense</h3>
+                    @foreach (var time in tocTimeOrder)
+                    {
+                        var group = Model.Tenses.Where(t => t.TimeKey == time).ToList();
+                        if (group.Count == 0)
+                        {
+                            continue;
+                        }
+                        <div class="grammar-toc__time-group" data-time="@time">
+                            <div class="grammar-toc__time-label">@tocTimeLabels[time]</div>
+                            <ul class="grammar-toc__tense-list">
+                                @foreach (var t in group)
+                                {
+                                    <li>
+                                        <a class="grammar-toc__tense-link"
+                                           href="#@t.AnchorId"
+                                           data-time="@t.TimeKey"
+                                           data-target="@t.AnchorId">@t.Title</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+                <a class="grammar-toc__top" href="#@GrammarGuideCatalog.PageTopAnchor">Back to top</a>
+            </nav>
+        </aside>
+    </div>
+</article>
+
+@section Scripts {
+    <script>
+        (function () {
+            'use strict';
+
+            // ── Quick Test ────────────────────────────────────────────────
+            const questions = document.querySelectorAll('.quick-test__q');
+            let score = 0;
+            const scoreEl = document.getElementById('testScore');
+            const messageEl = document.getElementById('testMessage');
+            const answered = new Set();
+
+            questions.forEach(function (q) {
+                const opts = q.querySelectorAll('.quick-test__opt');
+                opts.forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        const qIdx = q.dataset.q;
+                        if (answered.has(qIdx)) return;
+                        answered.add(qIdx);
+
+                        const feedback = q.querySelector('.quick-test__feedback');
+                        const correctIdx = parseInt(feedback.dataset.correct, 10);
+                        const chosenIdx = parseInt(btn.dataset.answer, 10);
+
+                        opts.forEach(function (o) { o.disabled = true; });
+
+                        if (chosenIdx === correctIdx) {
+                            btn.classList.add('correct');
+                            feedback.classList.add('show', 'quick-test__feedback--correct');
+                            score++;
+                        } else {
+                            btn.classList.add('wrong');
+                            feedback.classList.add('show', 'quick-test__feedback--wrong');
+                            opts[correctIdx].classList.add('correct');
+                        }
+
+                        scoreEl.textContent = score;
+
+                        if (answered.size === questions.length) {
+                            let msg = '';
+                            if (score === 3) msg = 'Perfect! You know your tenses!';
+                            else if (score === 2) msg = 'Good job! A little review will make it perfect.';
+                            else msg = 'Keep studying — this guide will help!';
+                            messageEl.textContent = msg;
+                        }
+                    });
+                });
+            });
+
+            // ── Tab Navigation ───────────────────────────────────────────
+            const tabs = document.querySelectorAll('.tense-tab');
+            const panels = document.querySelectorAll('.tense-panel');
+
+            function activateTimeTab(time) {
+                tabs.forEach(function (t) {
+                    const on = t.dataset.time === time;
+                    t.classList.toggle('active', on);
+                    t.setAttribute('aria-selected', on ? 'true' : 'false');
+                });
+                panels.forEach(function (p) {
+                    p.classList.toggle('active', p.dataset.time === time);
+                });
+                setTimeout(revealCards, 100);
+            }
+
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    activateTimeTab(tab.dataset.time);
+                });
+            });
+
+            // Deep links from the table of contents → switch tab, then scroll
+            document.querySelectorAll('.grammar-toc-tense-link').forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const time = link.dataset.time;
+                    const targetId = link.dataset.target;
+                    activateTimeTab(time);
+                    setTimeout(function () {
+                        var el = document.getElementById(targetId);
+                        if (el) {
+                            el.classList.add('revealed');
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            history.replaceState(null, '', '#' + targetId);
+                        }
+                    }, 130);
+                });
+            });
+
+            function applyTenseHash() {
+                var h = window.location.hash.slice(1);
+                if (!h) return;
+                var target = document.getElementById(h);
+                if (!target || !target.classList.contains('tense-card')) return;
+                var panel = target.closest('.tense-panel');
+                if (!panel) return;
+                activateTimeTab(panel.dataset.time);
+                setTimeout(function () {
+                    target.classList.add('revealed');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 130);
+            }
+            applyTenseHash();
+            window.addEventListener('hashchange', applyTenseHash);
+
+            // TOC: highlight current section
+            var tocNav = document.getElementById('grammar-toc');
+            var pageTopId = tocNav && tocNav.dataset.pageTop ? tocNav.dataset.pageTop : 'grammar-guide';
+            var tocSectionLinks = document.querySelectorAll('.grammar-toc__link[data-toc-section]');
+
+            function setActiveTocSection(id) {
+                tocSectionLinks.forEach(function (a) {
+                    a.classList.toggle('is-active', a.getAttribute('href') === '#' + id);
+                });
+            }
+
+            var sectionIo = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        setActiveTocSection(entry.target.id);
+                    }
+                });
+            }, { rootMargin: '-18% 0px -50% 0px', threshold: 0 });
+
+            document.querySelectorAll('.grammar-page--main > section[id]').forEach(function (sec) {
+                sectionIo.observe(sec);
+            });
+
+            window.addEventListener('scroll', function () {
+                if (window.scrollY < 140) {
+                    setActiveTocSection(pageTopId);
+                }
+            }, { passive: true });
+            if (window.scrollY < 140) {
+                setActiveTocSection(pageTopId);
+            }
+
+            // ── Scroll Reveal ────────────────────────────────────────────
+            let observer = null;
+
+            function revealCards() {
+                const cards = document.querySelectorAll('.tense-panel.active .tense-card:not(.revealed)');
+                if (cards.length === 0) return;
+
+                if (observer) observer.disconnect();
+
+                observer = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+                cards.forEach(function (card) {
+                    observer.observe(card);
+                });
+            }
+
+            // Reveal visible cards on load
+            setTimeout(revealCards, 200);
+
+        })();
+    </script>
+}

@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.13.6/r-2.5.0/datatables.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <!-- Mobile hamburger -->
@@ -82,6 +83,10 @@
                     <a class="slink" data-label="Grammar Quiz" asp-controller="GrammarQuestions" asp-action="StartQuiz">
                         <i class="bi bi-spellcheck"></i>
                         <span>Grammar Quiz</span>
+                    </a>
+                    <a class="slink" data-label="Grammar Guide" asp-controller="GrammarGuide" asp-action="Index">
+                        <i class="bi bi-book"></i>
+                        <span>Grammar Guide</span>
                     </a>
                 </div>
 
